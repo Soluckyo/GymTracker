@@ -7,11 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RegistrationTrainer {
-
-    private Long id;
-
-    private String name;
+public class RegisterAppUserRequest {
 
     @Email
     @NotBlank(message = "Email не может быть пустым")
@@ -20,7 +16,7 @@ public class RegistrationTrainer {
     @NotBlank(message = "Пароль не может быть пустым")
     private String password;
 
-    private String specialization;
+    private String role;
 
-    private String workExperience;
+    private Long externalUserId;
 }

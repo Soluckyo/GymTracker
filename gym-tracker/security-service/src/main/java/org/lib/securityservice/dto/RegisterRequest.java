@@ -1,18 +1,18 @@
-package org.lib.usermanagementservice.dto;
+package org.lib.securityservice.dto;
+
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class RegistrationTrainer {
-
-    private Long id;
-
-    private String name;
-
+@AllArgsConstructor
+@NoArgsConstructor
+public class RegisterRequest {
     @Email
     @NotBlank(message = "Email не может быть пустым")
     private String email;
@@ -20,7 +20,7 @@ public class RegistrationTrainer {
     @NotBlank(message = "Пароль не может быть пустым")
     private String password;
 
-    private String specialization;
+    private String role;
 
-    private String workExperience;
+    private Long externalUserId;
 }

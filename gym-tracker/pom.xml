@@ -11,11 +11,12 @@
 	<groupId>com.example</groupId>
 	<artifactId>gym-tracker</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
 	<name>gym-tracker</name>
 	<description>The Gym Tracker project</description>
 	<modules>
 		<module>eureka-server</module>
-		<module>auth-service</module>
+		<module>security-service</module>
 		<module>user-management-service</module>
 	</modules>
 	<url/>

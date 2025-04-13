@@ -2,7 +2,8 @@ package org.lib.usermanagementservice.service;
 
 
 import org.lib.usermanagementservice.dto.RegistrationTrainer;
+import org.lib.usermanagementservice.entity.Trainer;
 
 public interface ITrainerService{
-    void registerTrainer(RegistrationTrainer registrationTrainer);
+    Trainer registerTrainer(RegistrationTrainer registrationTrainer);
 }
