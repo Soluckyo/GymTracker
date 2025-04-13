@@ -16,6 +16,7 @@
 	<modules>
 		<module>eureka-server</module>
 		<module>auth-service</module>
+		<module>user-management-service</module>
 	</modules>
 	<url/>
 	<licenses>
