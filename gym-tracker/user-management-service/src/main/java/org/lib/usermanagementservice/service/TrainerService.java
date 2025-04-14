@@ -1,5 +1,6 @@
 package org.lib.usermanagementservice.service;
 
+import org.lib.usermanagementservice.client.AuthClient;
 import org.lib.usermanagementservice.dto.RegisterAppUserRequest;
 import org.lib.usermanagementservice.dto.RegistrationTrainer;
 import org.lib.usermanagementservice.entity.Trainer;

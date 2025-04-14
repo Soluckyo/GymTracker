@@ -1,6 +1,8 @@
 package org.lib.usermanagementservice.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import org.lib.usermanagementservice.client.AuthClient;
+import org.lib.usermanagementservice.dto.RegisterAppUserRequest;
 import org.lib.usermanagementservice.dto.RegistrationAdmin;
 import org.lib.usermanagementservice.dto.RegistrationTrainer;
 import org.lib.usermanagementservice.dto.RegistrationUser;
@@ -19,15 +21,17 @@ public class AdminService implements IAdminService {
     private final ITrainerService trainerService;
     private final IUserService userService;
     private final UserRepository userRepository;
+    private final AuthClient authClient;
 
-    public AdminService(AdminRepository adminRepository, ITrainerService trainerService, IUserService userService, UserRepository userRepository) {
+    public AdminService(AdminRepository adminRepository, ITrainerService trainerService, IUserService userService, UserRepository userRepository, AuthClient authClient) {
         this.adminRepository = adminRepository;
         this.trainerService = trainerService;
         this.userService = userService;
         this.userRepository = userRepository;
+        this.authClient = authClient;
     }
 
-    public void registerAdmin(RegistrationAdmin registrationAdmin) {
+    public Admin registerAdmin(RegistrationAdmin registrationAdmin) {
         if(registrationAdmin == null) {
             throw new IllegalArgumentException("Данные полей для регистрации администратора не заполнены");
         }
@@ -37,7 +41,17 @@ public class AdminService implements IAdminService {
                 .password(registrationAdmin.getPassword())
                 .build();
 
-        adminRepository.save(admin);
+        Admin savedAdmin = adminRepository.save(admin);
+
+        RegisterAppUserRequest authUser = new RegisterAppUserRequest();
+        authUser.setEmail(registrationAdmin.getEmail());
+        authUser.setPassword(registrationAdmin.getPassword());
+        authUser.setRole("ADMIN");
+        authUser.setExternalUserId(registrationAdmin.getId());
+
+        authClient.registerAppUser(authUser);
+
+        return savedAdmin;
     }
 
     public void registerTrainer(RegistrationTrainer registrationTrainer) {

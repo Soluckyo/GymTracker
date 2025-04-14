@@ -4,7 +4,7 @@ import org.lib.usermanagementservice.dto.RegistrationUser;
 import org.lib.usermanagementservice.entity.User;
 
 public interface IUserService {
-    void registerUser(RegistrationUser registrationUser);
+    User registerUser(RegistrationUser registrationUser);
     public User getUserByEmail(String email);
     public void deleteUserByEmail(String email);
 }

@@ -1,4 +1,4 @@
-package org.lib.usermanagementservice.service;
+package org.lib.usermanagementservice.client;
 
 import org.lib.usermanagementservice.dto.RegisterAppUserRequest;
 import org.springframework.beans.factory.annotation.Value;
