@@ -3,6 +3,7 @@ package org.lib.securityservice.service;
 import io.jsonwebtoken.Claims;
 import org.lib.securityservice.dto.JwtResponseDTO;
 import org.lib.securityservice.entity.AppUser;
+import org.springframework.http.ResponseEntity;
 
 import javax.crypto.SecretKey;
 
@@ -16,4 +17,5 @@ public interface IJwtService {
     Claims claimsFromToken(String token);
     String getEmailFromToken(String token);
     String getRoleFromToken(String token);
+    ResponseEntity<?> extractUserInfoFromToken(String authHeader);
 }

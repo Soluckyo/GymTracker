@@ -10,8 +10,11 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.lib.securityservice.dto.JwtResponseDTO;
+import org.lib.securityservice.dto.TokenValidationResponse;
 import org.lib.securityservice.entity.AppUser;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
@@ -58,6 +61,7 @@ public class JwtService implements IJwtService {
         Date now = new Date();
         return Jwts.builder()
                 .setSubject(user.getEmail())
+                .claim("role", user.getRole())
                 .setIssuedAt(now)
                 .setExpiration(dateEx)
                 .signWith(getSignInKey())
@@ -89,6 +93,28 @@ public class JwtService implements IJwtService {
                 log.error("invalid token", e);
                 return false;
             }
+    }
+
+    //Декодирование токена и получение данных
+    public ResponseEntity<?> extractUserInfoFromToken(String authHeader) {
+        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().body("Недопустимый заголовок авторизации");
+        }
+
+        String token = authHeader.substring(7);
+
+        if(!validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Недействительный или просроченный токен");
+        }
+
+        String email = getEmailFromToken(token);
+        String role = getRoleFromToken(token);
+
+        TokenValidationResponse tokenValidationResponse = new TokenValidationResponse();
+        tokenValidationResponse.setEmail(email);
+        tokenValidationResponse.setRole(role);
+
+        return ResponseEntity.ok(tokenValidationResponse);
     }
 
     //генерация аутентификационного токена(складываем токены в dto, чтобы потом отдать)
