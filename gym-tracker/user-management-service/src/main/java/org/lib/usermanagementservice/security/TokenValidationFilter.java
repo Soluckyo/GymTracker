@@ -1,27 +1,34 @@
 package org.lib.usermanagementservice.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.lib.usermanagementservice.dto.JwtValidationResponse;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @Component
 public class TokenValidationFilter extends OncePerRequestFilter {
 
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
 
-    public TokenValidationFilter(RestTemplate restTemplate) {
+    public TokenValidationFilter(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -30,7 +37,8 @@ public class TokenValidationFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            filterChain.doFilter(request, response);
+            return;
         }
 
         String token = authHeader.substring(7);
@@ -49,11 +57,23 @@ public class TokenValidationFilter extends OncePerRequestFilter {
                     String.class
             );
 
-            if(validationResponse.getStatusCode().is2xxSuccessful()){
-                filterChain.doFilter(request, response); //токен валиден, все хорошо
-            }else {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            //если токен валиден то, кладем в контекст пользователя
+            if(validationResponse.getStatusCode().is2xxSuccessful()) {
+                String body = validationResponse.getBody();
+                JwtValidationResponse jwtInfo = objectMapper.readValue(body, JwtValidationResponse.class);
+                List<SimpleGrantedAuthority> authorities = List.of(
+                        new SimpleGrantedAuthority("ROLE_" + jwtInfo.getRole())
+                );
+
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        jwtInfo.getEmail(), null, authorities
+                );
+
+                //кладем в контекст информацию о пользователе из токена
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
+                filterChain.doFilter(request, response);
+
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
