@@ -26,6 +26,7 @@ import java.util.Date;
 @Service
 public class JwtService implements IJwtService {
 
+    private final TokenService tokenService;
     @Value("${jwt.secret}")
     private String SECRET;
 
@@ -34,6 +35,10 @@ public class JwtService implements IJwtService {
 
     @Value("${jwt.refresh_expiration_days}")
     private Long REFRESH_EXPIRATION_DAYS;
+
+    public JwtService(TokenService tokenService) {
+        this.tokenService = tokenService;
+    }
 
     //Генерация Access токена
     public String generateAccessToken(AppUser user) {
@@ -59,13 +64,17 @@ public class JwtService implements IJwtService {
         Date dateEx = Date.from(LocalDateTime.now().plusDays(REFRESH_EXPIRATION_DAYS)
                 .atZone(ZoneId.systemDefault()).toInstant());
         Date now = new Date();
-        return Jwts.builder()
+        String refreshToken = Jwts.builder()
                 .setSubject(user.getEmail())
                 .claim("role", user.getRole())
                 .setIssuedAt(now)
                 .setExpiration(dateEx)
                 .signWith(getSignInKey())
                 .compact();
+
+        tokenService.saveRefreshToken(user, refreshToken, REFRESH_EXPIRATION_DAYS);
+
+        return refreshToken;
     }
 
     //проверка правильности токена

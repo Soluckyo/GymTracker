@@ -30,6 +30,7 @@ public class AuthController {
         this.appUserService = appUserService;
     }
 
+    //TODO: возможно стоит добавить метод signIn в user-management-service
     @PostMapping("/login")
     public ResponseEntity<JwtResponseDTO> signIn(@RequestBody JwtRequestDTO jwtRequestDTO){
         try{
