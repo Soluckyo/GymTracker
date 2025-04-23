@@ -1,5 +1,7 @@
 package org.lib.usermanagementservice.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.lib.usermanagementservice.dto.RegistrationTrainer;
 import org.lib.usermanagementservice.service.TrainerService;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/trainer")
+@Tag(name="trainer_controller")
 public class TrainerController {
 
     private final TrainerService trainerService;
@@ -18,6 +21,10 @@ public class TrainerController {
         this.trainerService = trainerService;
     }
 
+    @Operation(
+            summary = "Регистрация тренера",
+            description = "Создает нового тренера, принимает DTO RegistrationTrainer"
+    )
     @PostMapping("/register-trainer")
     public ResponseEntity<String> registerTrainer(@RequestBody RegistrationTrainer registrationTrainer) {
         trainerService.registerTrainer(registrationTrainer);

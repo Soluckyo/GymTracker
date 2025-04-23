@@ -33,7 +33,9 @@ public class SecurityConfig {
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/user-management-service/admin/register-user", "/user-management-service/admin/register-trainer",
                                 "/user-management-service/admin/register-admin", "/user-management-service/trainer/register-trainer",
-                                "/user-management-service/user/register-user").permitAll()
+                                "/user-management-service/user/register-user",
+                                "/v3/api-docs/**", "/swagger-resources/**",
+                                "/swagger-ui.html", "/webjars/**", "/swagger-ui/**").permitAll()
                         .anyRequest().permitAll())
                 .addFilterBefore(tokenValidationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();

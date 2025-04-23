@@ -1,5 +1,7 @@
 package org.lib.securityservice.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.lib.securityservice.dto.JwtRequestDTO;
 import org.lib.securityservice.dto.JwtResponseDTO;
@@ -19,6 +21,7 @@ import javax.naming.AuthenticationException;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "auth_controller")
 public class AuthController {
 
     private final IJwtService jwtService;
@@ -29,7 +32,11 @@ public class AuthController {
         this.appUserService = appUserService;
     }
 
-    //TODO: возможно стоит добавить метод signIn в user-management-service
+
+    @Operation(
+            summary = "Войти в систему",
+            description = "Аутентифицирует пользователя"
+    )
     @PostMapping("/login")
     public ResponseEntity<JwtResponseDTO> signIn(@RequestBody JwtRequestDTO jwtRequestDTO){
         try{
@@ -40,6 +47,10 @@ public class AuthController {
         }
     }
 
+    @Operation(
+            summary = "Обновить токен",
+            description = "Принимает RefreshToken и обновляет AccessToken"
+    )
     @PostMapping("/refresh")
     public ResponseEntity<JwtResponseDTO> refresh(@RequestBody RefreshTokenDTO refreshTokenDTO) {
         try{
@@ -50,12 +61,20 @@ public class AuthController {
         }
     }
 
+    @Operation(
+            summary = "Создание сущности AppUser",
+            description = "Создает новую сущность AppUser на основе присланного пользователя из user-management-service"
+    )
     @PostMapping("/register")
     public ResponseEntity<Void> register(@Valid @RequestBody RegisterRequest request) {
         appUserService.register(request);
         return ResponseEntity.ok().build();
     }
 
+    @Operation(
+            summary = "Валидация токена (только для внутреннего пользования из других микросервисов)",
+            description = "Проверяет валиден ли токен. Берет токен из Header authorization"
+    )
     @GetMapping("/validate")
     public ResponseEntity<?> validate(@RequestHeader("Authorization") String authHeader) {
         return jwtService.extractUserInfoFromToken(authHeader);

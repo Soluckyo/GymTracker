@@ -1,6 +1,7 @@
 package org.lib.usermanagementservice.controller;
 
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.lib.usermanagementservice.dto.RegistrationAdmin;
 import org.lib.usermanagementservice.dto.RegistrationTrainer;
 import org.lib.usermanagementservice.dto.RegistrationUser;
@@ -18,9 +19,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/admin")
+@Tag(name = "admin_controller")
 public class AdminController {
 
     private final AdminService adminService;
@@ -29,6 +32,10 @@ public class AdminController {
         this.adminService = adminService;
     }
 
+    @Operation(
+            summary = "Получение всех пользователей",
+            description = "Получает из базы все задачи и отдает в виде Page<User>, ничего не принимает"
+    )
     @GetMapping("/users")
     public ResponseEntity<Page<User>> getUsers(
             @RequestParam(defaultValue = "0") int page,
@@ -43,6 +50,10 @@ public class AdminController {
     }
 
     //TODO: переделать на логику поиска по телефону
+    @Operation(
+            summary = "Получение пользователя",
+            description = "Получает из базы пользователя и отдает в виде User, принимает email"
+    )
     @GetMapping("/user/{userEmail}")
     public ResponseEntity<User> getUser(@PathVariable String userEmail) {
         User user = adminService.getUser(userEmail);
@@ -53,6 +64,10 @@ public class AdminController {
     }
 
     //TODO: добавить проверку на ошибки
+    @Operation(
+            summary = "Регистрация админа",
+            description = "Создает нового администратора, принимает DTO RegistrationAdmin"
+    )
     @PostMapping("/register-admin")
     public ResponseEntity<String> registerAdmin(@RequestBody RegistrationAdmin registrationAdmin) {
         adminService.registerAdmin(registrationAdmin);
@@ -60,6 +75,10 @@ public class AdminController {
     }
 
     //TODO: добавить проверку на ошибки
+    @Operation(
+            summary = "Регистрация пользователя",
+            description = "Создает нового пользователя, принимает DTO RegistrationUser"
+    )
     @PostMapping("/register-user")
     public ResponseEntity<String> registerUser(@RequestBody RegistrationUser registrationUser) {
         adminService.registerUser(registrationUser);
@@ -67,6 +86,10 @@ public class AdminController {
     }
 
     //TODO: добавить проверку на ошибки
+    @Operation(
+            summary = "Регистрация тренера",
+            description = "Создает нового тренера, принимает DTO RegistrationTrainer"
+    )
     @PostMapping("/register-trainer")
     public ResponseEntity<String> registerTrainer(@RequestBody RegistrationTrainer registrationTrainer) {
         adminService.registerTrainer(registrationTrainer);
