@@ -60,7 +60,7 @@ public class AppUserService implements IAppUserService {
 
         AppUser appUser = AppUser.builder()
                 .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
+                .password(request.getPassword())
                 .role(request.getRole())
                 .externalUserId(request.getExternalUserId())
                 .build();

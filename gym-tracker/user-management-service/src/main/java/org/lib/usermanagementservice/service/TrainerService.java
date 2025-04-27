@@ -5,16 +5,19 @@ import org.lib.usermanagementservice.dto.RegisterAppUserRequest;
 import org.lib.usermanagementservice.dto.RegistrationTrainer;
 import org.lib.usermanagementservice.entity.Trainer;
 import org.lib.usermanagementservice.repository.TrainerRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TrainerService implements ITrainerService {
     private final TrainerRepository trainerRepository;
     private final AuthClient authClient;
+    private final PasswordEncoder passwordEncoder;
 
-    public TrainerService(TrainerRepository trainerRepository, AuthClient authClient) {
+    public TrainerService(TrainerRepository trainerRepository, AuthClient authClient, PasswordEncoder passwordEncoder) {
         this.trainerRepository = trainerRepository;
         this.authClient = authClient;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Trainer registerTrainer(RegistrationTrainer registrationTrainer) {
@@ -25,7 +28,7 @@ public class TrainerService implements ITrainerService {
                 .id(registrationTrainer.getId())
                 .name(registrationTrainer.getName())
                 .email(registrationTrainer.getEmail())
-                .password(registrationTrainer.getPassword())
+                .password(passwordEncoder.encode(registrationTrainer.getPassword()))
                 .specialization(registrationTrainer.getSpecialization())
                 .workExperience(registrationTrainer.getWorkExperience())
                 .build();
@@ -33,7 +36,7 @@ public class TrainerService implements ITrainerService {
 
         RegisterAppUserRequest authUser = new RegisterAppUserRequest();
         authUser.setEmail(registrationTrainer.getEmail());
-        authUser.setPassword(registrationTrainer.getPassword());
+        authUser.setPassword(passwordEncoder.encode(registrationTrainer.getPassword()));
         authUser.setRole("TRAINER");
         authUser.setExternalUserId(registrationTrainer.getId());
 

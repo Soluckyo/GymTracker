@@ -12,6 +12,7 @@ import org.lib.usermanagementservice.repository.AdminRepository;
 import org.lib.usermanagementservice.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,15 +23,17 @@ public class AdminService implements IAdminService {
     private final IUserService userService;
     private final UserRepository userRepository;
     private final AuthClient authClient;
+    private final PasswordEncoder passwordEncoder;
 
-    public AdminService(AdminRepository adminRepository, ITrainerService trainerService, IUserService userService, UserRepository userRepository, AuthClient authClient) {
+    public AdminService(AdminRepository adminRepository, ITrainerService trainerService, IUserService userService, UserRepository userRepository, AuthClient authClient, PasswordEncoder passwordEncoder) {
         this.adminRepository = adminRepository;
         this.trainerService = trainerService;
         this.userService = userService;
         this.userRepository = userRepository;
         this.authClient = authClient;
+        this.passwordEncoder = passwordEncoder;
     }
-
+    //TODO: изменить логику возвращения(не возвращать пароль)
     public Admin registerAdmin(RegistrationAdmin registrationAdmin) {
         if(registrationAdmin == null) {
             throw new IllegalArgumentException("Данные полей для регистрации администратора не заполнены");
@@ -38,14 +41,14 @@ public class AdminService implements IAdminService {
         Admin admin = Admin.builder()
                 .name(registrationAdmin.getName())
                 .email(registrationAdmin.getEmail())
-                .password(registrationAdmin.getPassword())
+                .password(passwordEncoder.encode(registrationAdmin.getPassword()))
                 .build();
 
         Admin savedAdmin = adminRepository.save(admin);
 
         RegisterAppUserRequest authUser = new RegisterAppUserRequest();
         authUser.setEmail(registrationAdmin.getEmail());
-        authUser.setPassword(registrationAdmin.getPassword());
+        authUser.setPassword(passwordEncoder.encode(registrationAdmin.getPassword()));
         authUser.setRole("ADMIN");
         authUser.setExternalUserId(registrationAdmin.getId());
 
