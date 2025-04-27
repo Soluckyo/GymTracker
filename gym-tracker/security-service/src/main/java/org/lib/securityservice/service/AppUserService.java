@@ -5,6 +5,7 @@ import org.lib.securityservice.dto.JwtResponseDTO;
 import org.lib.securityservice.dto.RefreshTokenDTO;
 import org.lib.securityservice.dto.RegisterRequest;
 import org.lib.securityservice.entity.AppUser;
+import org.lib.securityservice.exception.EmailAlreadyExistsException;
 import org.lib.securityservice.repository.AppUserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -55,7 +56,7 @@ public class AppUserService implements IAppUserService {
 
     public void register(RegisterRequest request) {
         if (appUserRepository.existsByEmail(request.getEmail())){
-            throw new IllegalArgumentException("Пользователь уже существует");
+            throw new EmailAlreadyExistsException("Такой Email уже используется");
         }
 
         AppUser appUser = AppUser.builder()

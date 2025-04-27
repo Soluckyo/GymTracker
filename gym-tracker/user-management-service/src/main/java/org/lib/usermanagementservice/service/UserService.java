@@ -5,6 +5,7 @@ import org.lib.usermanagementservice.client.AuthClient;
 import org.lib.usermanagementservice.dto.RegisterAppUserRequest;
 import org.lib.usermanagementservice.dto.RegistrationUser;
 import org.lib.usermanagementservice.entity.User;
+import org.lib.usermanagementservice.exception.EmailAlreadyExistsException;
 import org.lib.usermanagementservice.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,10 +24,12 @@ public class UserService implements IUserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    //TODO: добавить encoder
     public User registerUser(RegistrationUser registrationUser) {
         if (registrationUser == null) {
             throw new IllegalArgumentException("Данные полей для регистрации пользователя не заполнены");
+        }
+        if(userRepository.existsByEmail(registrationUser.getEmail())){
+            throw new EmailAlreadyExistsException("Такой Email уже используется");
         }
         User user = User.builder()
                 .email(registrationUser.getEmail())

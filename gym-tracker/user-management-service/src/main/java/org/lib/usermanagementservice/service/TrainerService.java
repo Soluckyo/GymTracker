@@ -4,6 +4,7 @@ import org.lib.usermanagementservice.client.AuthClient;
 import org.lib.usermanagementservice.dto.RegisterAppUserRequest;
 import org.lib.usermanagementservice.dto.RegistrationTrainer;
 import org.lib.usermanagementservice.entity.Trainer;
+import org.lib.usermanagementservice.exception.EmailAlreadyExistsException;
 import org.lib.usermanagementservice.repository.TrainerRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,9 @@ public class TrainerService implements ITrainerService {
     public Trainer registerTrainer(RegistrationTrainer registrationTrainer) {
         if(registrationTrainer == null) {
             throw new IllegalArgumentException("Данные полей для регистрации тренера не заполнены");
+        }
+        if(trainerRepository.existsByEmail(registrationTrainer.getEmail())){
+            throw new EmailAlreadyExistsException("Такой Email уже используется");
         }
         Trainer trainer = Trainer.builder()
                 .id(registrationTrainer.getId())

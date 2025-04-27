@@ -8,6 +8,7 @@ import org.lib.usermanagementservice.dto.RegistrationTrainer;
 import org.lib.usermanagementservice.dto.RegistrationUser;
 import org.lib.usermanagementservice.entity.Admin;
 import org.lib.usermanagementservice.entity.User;
+import org.lib.usermanagementservice.exception.EmailAlreadyExistsException;
 import org.lib.usermanagementservice.repository.AdminRepository;
 import org.lib.usermanagementservice.repository.UserRepository;
 import org.springframework.data.domain.Page;
@@ -37,6 +38,9 @@ public class AdminService implements IAdminService {
     public Admin registerAdmin(RegistrationAdmin registrationAdmin) {
         if(registrationAdmin == null) {
             throw new IllegalArgumentException("Данные полей для регистрации администратора не заполнены");
+        }
+        if(adminRepository.existsByEmail(registrationAdmin.getEmail())){
+            throw new EmailAlreadyExistsException("Такой Email уже используется");
         }
         Admin admin = Admin.builder()
                 .name(registrationAdmin.getName())
