@@ -62,4 +62,8 @@ public class UserService implements IUserService {
         userRepository.deleteByEmail(email);
     }
 
+    //TODO: добавление тренировки
+    public void addPersonalTraining(){
+    }
+
 }
