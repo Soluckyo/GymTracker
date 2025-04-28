@@ -4,28 +4,24 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.Date;
 
 @Entity
 @Getter
 @Setter
-public class Subscription {
+public class SubscriptionPlan {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String planId;
 
-    @OneToOne
-    private SubscriptionPlan subscriptionPlan;
+    private String planName;
 
-    private Long userId;
+    private String duration;
 
-    private Date startDate;
-
-    private Date endDate;
+    private Double cost;
 
     private Status status;
+
 }
