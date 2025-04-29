@@ -1,7 +1,7 @@
 package org.lib.subscriptionservice.service;
 
 import org.lib.subscriptionservice.dto.InfoSubscriptionDTO;
-import org.lib.subscriptionservice.dto.SubscriptionCreateDTO;
+import org.lib.subscriptionservice.entity.Payment;
 import org.lib.subscriptionservice.entity.Status;
 import org.lib.subscriptionservice.entity.Subscription;
 import org.lib.subscriptionservice.entity.SubscriptionPlan;
@@ -12,6 +12,8 @@ import org.lib.subscriptionservice.repository.SubscriptionRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,13 +29,14 @@ public class SubscriptionService implements ISubscriptionService {
         this.subscriptionPlanRepository = subscriptionPlanRepository;
     }
 
-    public Subscription createSubscription(SubscriptionCreateDTO dto) {
-        SubscriptionPlan plan = subscriptionPlanRepository.findById(dto.getSubscriptionPlanId())
+    @Transactional(propagation = Propagation.MANDATORY)
+    public Subscription createSubscriptionFromPayment(Payment payment) {
+        SubscriptionPlan plan = subscriptionPlanRepository.findById(payment.getSubscriptionPlanId())
                 .orElseThrow(() -> new SubscriptionPlanNotFoundException("Не найден тарифный план!"));
 
         Subscription subscription = Subscription.builder()
                 .subscriptionPlan(plan)
-                .userId(dto.getUserId())
+                .userId(payment.getUserId())
                 .status(Status.ACTIVE)
                 .startDate(LocalDateTime.now())
                 .build();
@@ -42,7 +45,7 @@ public class SubscriptionService implements ISubscriptionService {
         return subscription;
     }
 
-    public Subscription updateSubscription(Subscription subscription) {
+    public Subscription updateStatusSubscription(String subscriptionId, Status status) {
         return null;
     }
 
