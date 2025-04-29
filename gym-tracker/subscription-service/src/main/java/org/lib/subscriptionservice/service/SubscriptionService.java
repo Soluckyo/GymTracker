@@ -34,6 +34,7 @@ public class SubscriptionService implements ISubscriptionService {
         SubscriptionPlan plan = subscriptionPlanRepository.findById(payment.getSubscriptionPlanId())
                 .orElseThrow(() -> new SubscriptionPlanNotFoundException("Не найден тарифный план!"));
 
+        //TODO: доделать дату окончания абонемента
         Subscription subscription = Subscription.builder()
                 .subscriptionPlan(plan)
                 .userId(payment.getUserId())
@@ -77,6 +78,7 @@ public class SubscriptionService implements ISubscriptionService {
         Subscription subscription = subscriptionRepository.findByUserId(userId).orElseThrow(
                 () -> new SubscriptionNotFoundException("Абонемент не найден!"));
 
+        //TODO: доделать конечную дату
         return InfoSubscriptionDTO.builder()
                 .status(subscription.getStatus())
                 .startDate(subscription.getStartDate())
