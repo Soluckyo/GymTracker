@@ -24,7 +24,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
 
     @Column(nullable = false, unique = true)
     @Email(message = "Пожалуйста введите корректный email")
@@ -38,8 +38,4 @@ public class User {
     private String lastName;
 
     private String phoneNumber;
-
-    private Long subscriptionId;
-
-
 }
