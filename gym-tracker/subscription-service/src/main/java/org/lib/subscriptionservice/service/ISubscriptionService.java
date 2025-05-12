@@ -7,11 +7,13 @@ import org.lib.subscriptionservice.entity.Subscription;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.UUID;
+
 public interface ISubscriptionService {
     Subscription createSubscriptionFromPayment(Payment payment);
-    boolean deleteSubscription(Long subscriptionId);
+    boolean deleteSubscription(UUID subscriptionId);
     Page<Subscription> getAllSubscriptionsAdmin(Pageable pageable);
     Page<Subscription> getAllActiveSubscriptionsUser(Pageable pageable);
-    InfoSubscriptionDTO getInfoSubscription(Long userId);
-    Subscription updateStatusSubscription(String subscriptionId, Status status);
+    InfoSubscriptionDTO getInfoSubscription(UUID userId);
+    Subscription updateStatusSubscription(UUID subscriptionId, Status status);
 }

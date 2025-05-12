@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Setter
 @Getter
 @AllArgsConstructor
@@ -16,7 +18,7 @@ import lombok.Setter;
 public class RegistrationAdmin {
 
     @Schema(description = "Id администратора (необязательно указывать)", example = "12")
-    private Long id;
+    private UUID id;
 
     @Schema(description = "Имя администратора", example = "John")
     private String name;

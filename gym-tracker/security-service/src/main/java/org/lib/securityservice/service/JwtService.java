@@ -21,6 +21,7 @@ import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -48,6 +49,7 @@ public class JwtService implements IJwtService {
         return Jwts.builder()
                 .setSubject(user.getEmail())
                 .claim("role", user.getRole())
+                .claim("userId", user.getExternalUserId().toString())
                 .setIssuedAt(now)
                 .setExpiration(dateEx)
                 .signWith(getSignInKey())
@@ -116,10 +118,12 @@ public class JwtService implements IJwtService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Недействительный или просроченный токен");
         }
 
+        UUID userId = UUID.fromString(getUserIdFromToken(token));
         String email = getEmailFromToken(token);
         String role = getRoleFromToken(token);
 
         TokenValidationResponse tokenValidationResponse = new TokenValidationResponse();
+        tokenValidationResponse.setUserId(userId);
         tokenValidationResponse.setEmail(email);
         tokenValidationResponse.setRole(role);
 
@@ -151,13 +155,30 @@ public class JwtService implements IJwtService {
                 .getBody();
     }
 
-    //получаем email
+    /**
+     * Достает Email токена доступа
+     * @param token токен доступа
+     * @return строку с Email
+     */
     public String getEmailFromToken(String token) {
         return claimsFromToken(token).getSubject();
     }
 
-    //получаем role
+    /**
+     * Достает роль пользователя из токена
+     * @param token токен доступа
+     * @return строку с ролью
+     */
     public String getRoleFromToken(String token) {
         return claimsFromToken(token).get("role", String.class);
+    }
+
+    /**
+     * Достает из токена userId в виде строки
+     * @param token токен доступа
+     * @return Строку с UUID пользователя
+     */
+    public String getUserIdFromToken(String token) {
+        return claimsFromToken(token).get("userId", String.class);
     }
 }

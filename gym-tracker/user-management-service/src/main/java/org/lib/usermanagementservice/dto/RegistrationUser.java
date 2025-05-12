@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,7 +19,7 @@ import lombok.Setter;
 public class RegistrationUser {
 
     @Schema(description = "Id пользователя (необязательно указывать)", example = "12")
-    private Long id;
+    private UUID userId;
 
     @Schema(description = "Имя", example = "Боб")
     private String firstName;

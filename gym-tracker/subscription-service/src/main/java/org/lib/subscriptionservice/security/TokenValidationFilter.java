@@ -1,12 +1,11 @@
-package org.lib.usermanagementservice.security;
+package org.lib.subscriptionservice.security;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.lib.usermanagementservice.dto.JwtValidationResponse;
+import org.lib.subscriptionservice.dto.JwtValidationResponse;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -26,7 +25,6 @@ public class TokenValidationFilter extends OncePerRequestFilter {
 
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
-    private UsernamePasswordAuthenticationToken authenticationToken;
 
     public TokenValidationFilter(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
@@ -51,6 +49,7 @@ public class TokenValidationFilter extends OncePerRequestFilter {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         //отправляем запрос в security-service на валидность токена
+        //TODO: возможно позже стоит поменять на KAFKA вместе с переходом системы на нее
         try{
             ResponseEntity<String> validationResponse = restTemplate.exchange(
                     securityServiceUrl,
@@ -61,10 +60,19 @@ public class TokenValidationFilter extends OncePerRequestFilter {
 
             //если токен валиден то, кладем в контекст пользователя
             if(validationResponse.getStatusCode().is2xxSuccessful()) {
-                authenticationToken = prepareAuthenticationToken(validationResponse);
-            }
+                String body = validationResponse.getBody();
+                JwtValidationResponse jwtInfo = objectMapper.readValue(body, JwtValidationResponse.class);
+                List<SimpleGrantedAuthority> authorities = List.of(
+                        new SimpleGrantedAuthority("ROLE_" + jwtInfo.getRole())
+                );
 
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        jwtInfo.getEmail(), null, authorities
+                );
+
+                //кладем в контекст информацию о пользователе из токена
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
             filterChain.doFilter(request, response);
 
         } catch (Exception e) {
@@ -72,26 +80,5 @@ public class TokenValidationFilter extends OncePerRequestFilter {
         }
 
     }
-
-    public UsernamePasswordAuthenticationToken prepareAuthenticationToken(ResponseEntity<String> validationResponse) {
-            String body = validationResponse.getBody();
-        JwtValidationResponse jwtInfo = null;
-        try {
-            jwtInfo = objectMapper.readValue(body, JwtValidationResponse.class);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        List<SimpleGrantedAuthority> authorities = List.of(
-                    new SimpleGrantedAuthority("ROLE_" + jwtInfo.getRole())
-            );
-
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    jwtInfo.getEmail(), null, authorities
-            );
-
-
-            authenticationToken.setDetails(jwtInfo.getUserId());
-
-            return authenticationToken;
-    }
 }
+

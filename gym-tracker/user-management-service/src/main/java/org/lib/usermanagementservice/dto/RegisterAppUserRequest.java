@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @Schema(description = "Запрос на регистрацию AppUser из security-service")
@@ -24,5 +26,5 @@ public class RegisterAppUserRequest {
     private String role;
 
     @Schema(description = "Id из user-management-service", example = "12")
-    private Long externalUserId;
+    private UUID externalUserId;
 }

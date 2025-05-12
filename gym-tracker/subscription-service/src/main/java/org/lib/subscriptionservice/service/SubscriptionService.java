@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class SubscriptionService implements ISubscriptionService {
@@ -46,11 +47,11 @@ public class SubscriptionService implements ISubscriptionService {
         return subscription;
     }
 
-    public Subscription updateStatusSubscription(String subscriptionId, Status status) {
+    public Subscription updateStatusSubscription(UUID subscriptionId, Status status) {
         return null;
     }
 
-    public boolean deleteSubscription(Long subscriptionId) {
+    public boolean deleteSubscription(UUID subscriptionId) {
         if(!subscriptionRepository.existsById(subscriptionId)) {
             throw new SubscriptionNotFoundException("Такого абонемента не существует");
         }
@@ -74,7 +75,7 @@ public class SubscriptionService implements ISubscriptionService {
         return subscriptionRepository.findBySubscriptionPlanIn(activePlan, pageable);
     }
 
-    public InfoSubscriptionDTO getInfoSubscription(Long userId) {
+    public InfoSubscriptionDTO getInfoSubscription(UUID userId) {
         Subscription subscription = subscriptionRepository.findByUserId(userId).orElseThrow(
                 () -> new SubscriptionNotFoundException("Абонемент не найден!"));
 

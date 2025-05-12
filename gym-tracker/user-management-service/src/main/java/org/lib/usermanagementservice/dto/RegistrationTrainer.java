@@ -6,13 +6,15 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @Schema(description = "DTO для регистрации администратора")
 public class RegistrationTrainer {
 
     @Schema(description = "Id тренера (необязательно указывать)", example = "12")
-    private Long id;
+    private UUID trainerId;
 
     @Schema(description = "Имя администратора", example = "Боб")
     private String name;

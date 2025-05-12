@@ -13,6 +13,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "users")
 @Getter
@@ -24,7 +26,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private UUID userId;
 
     @Column(nullable = false, unique = true)
     @Email(message = "Пожалуйста введите корректный email")

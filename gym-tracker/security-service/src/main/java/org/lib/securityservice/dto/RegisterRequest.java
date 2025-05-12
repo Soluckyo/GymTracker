@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -28,5 +30,5 @@ public class RegisterRequest {
     private String role;
 
     @Schema(description = "Id из user-management-service", example = "12")
-    private Long externalUserId;
+    private UUID externalUserId;
 }

@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.lib.securityservice.service.JwtService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Component
+@Slf4j
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
 
@@ -43,8 +45,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String email = jwtService.getEmailFromToken(token);
         String role = jwtService.getRoleFromToken(token);
 
-        //аля логирование
-        System.out.println("Authenticated User: " + email + " with Role: " + role);
+        log.info("Authenticated User: {} with Role: {}", email, role);
 
         Collection<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
 

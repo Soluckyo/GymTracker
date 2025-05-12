@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Getter
 @Setter
@@ -20,9 +22,9 @@ public class AppUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long appUserId;
+    private UUID appUserId;
     private String email;
     private String password;
     private String role;
-    private Long externalUserId; //Id из user-management-service
+    private UUID externalUserId; //Id из user-management-service
 }
