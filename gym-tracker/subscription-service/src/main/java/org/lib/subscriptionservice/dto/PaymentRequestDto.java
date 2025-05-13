@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Getter
 @Setter
-public class PaymentRequestDTO {
-    private Long subscriptionPlanId;
+public class PaymentRequestDto {
+    private UUID subscriptionPlanId;
     private BigDecimal amount;
 }

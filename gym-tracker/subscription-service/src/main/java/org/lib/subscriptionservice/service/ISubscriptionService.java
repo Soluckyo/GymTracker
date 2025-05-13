@@ -1,6 +1,6 @@
 package org.lib.subscriptionservice.service;
 
-import org.lib.subscriptionservice.dto.InfoSubscriptionDTO;
+import org.lib.subscriptionservice.dto.InfoSubscriptionDto;
 import org.lib.subscriptionservice.entity.Payment;
 import org.lib.subscriptionservice.entity.Status;
 import org.lib.subscriptionservice.entity.Subscription;
@@ -14,6 +14,6 @@ public interface ISubscriptionService {
     boolean deleteSubscription(UUID subscriptionId);
     Page<Subscription> getAllSubscriptionsAdmin(Pageable pageable);
     Page<Subscription> getAllActiveSubscriptionsUser(Pageable pageable);
-    InfoSubscriptionDTO getInfoSubscription(UUID userId);
+    InfoSubscriptionDto getInfoSubscription(UUID userId);
     Subscription updateStatusSubscription(UUID subscriptionId, Status status);
 }

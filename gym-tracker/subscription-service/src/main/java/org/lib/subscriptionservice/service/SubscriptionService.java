@@ -1,6 +1,6 @@
 package org.lib.subscriptionservice.service;
 
-import org.lib.subscriptionservice.dto.InfoSubscriptionDTO;
+import org.lib.subscriptionservice.dto.InfoSubscriptionDto;
 import org.lib.subscriptionservice.entity.Payment;
 import org.lib.subscriptionservice.entity.Status;
 import org.lib.subscriptionservice.entity.Subscription;
@@ -75,12 +75,12 @@ public class SubscriptionService implements ISubscriptionService {
         return subscriptionRepository.findBySubscriptionPlanIn(activePlan, pageable);
     }
 
-    public InfoSubscriptionDTO getInfoSubscription(UUID userId) {
+    public InfoSubscriptionDto getInfoSubscription(UUID userId) {
         Subscription subscription = subscriptionRepository.findByUserId(userId).orElseThrow(
                 () -> new SubscriptionNotFoundException("Абонемент не найден!"));
 
         //TODO: доделать конечную дату
-        return InfoSubscriptionDTO.builder()
+        return InfoSubscriptionDto.builder()
                 .status(subscription.getStatus())
                 .startDate(subscription.getStartDate())
                 .endDate(subscription.getEndDate())

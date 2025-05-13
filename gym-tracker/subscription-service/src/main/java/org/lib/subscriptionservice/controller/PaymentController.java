@@ -1,6 +1,6 @@
 package org.lib.subscriptionservice.controller;
 
-import org.lib.subscriptionservice.dto.PaymentRequestDTO;
+import org.lib.subscriptionservice.dto.PaymentRequestDto;
 import org.lib.subscriptionservice.entity.Payment;
 import org.lib.subscriptionservice.entity.PaymentStatus;
 import org.lib.subscriptionservice.service.IPaymentService;
@@ -23,7 +23,7 @@ public class PaymentController {
     }
 
     @PostMapping("/")
-    public PaymentStatus createPayment(@RequestBody PaymentRequestDTO paymentRequestDTO) {
+    public PaymentStatus createPayment(@RequestBody PaymentRequestDto paymentRequestDTO) {
         UUID userId = (UUID) SecurityContextHolder.getContext().getAuthentication().getDetails();
         Payment payment = paymentService.createPayment(paymentRequestDTO, userId);
         return payment.getPaymentStatus();

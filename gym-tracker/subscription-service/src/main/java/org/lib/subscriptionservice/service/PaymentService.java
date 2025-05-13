@@ -1,6 +1,6 @@
 package org.lib.subscriptionservice.service;
 
-import org.lib.subscriptionservice.dto.PaymentRequestDTO;
+import org.lib.subscriptionservice.dto.PaymentRequestDto;
 import org.lib.subscriptionservice.entity.Payment;
 import org.lib.subscriptionservice.entity.PaymentStatus;
 import org.lib.subscriptionservice.repository.PaymentRepository;
@@ -22,7 +22,7 @@ public class PaymentService implements IPaymentService {
     }
 
     @Transactional
-    public Payment createPayment(PaymentRequestDTO paymentRequestDTO, UUID userId) {
+    public Payment createPayment(PaymentRequestDto paymentRequestDTO, UUID userId) {
         //Тут должно быть проверка и списание средств!!
         int random = (int) (Math.random() * 10);
         boolean paymentSuccess = random > 2;

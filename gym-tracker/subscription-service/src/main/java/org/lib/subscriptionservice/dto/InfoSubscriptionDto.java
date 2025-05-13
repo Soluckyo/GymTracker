@@ -6,12 +6,11 @@ import lombok.Setter;
 import org.lib.subscriptionservice.entity.Status;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Getter
 @Setter
 @Builder
-public class InfoSubscriptionDTO {
+public class InfoSubscriptionDto {
     private String namePlan;
     private String duration;
     private LocalDateTime startDate;
