@@ -4,10 +4,13 @@ import org.lib.subscriptionservice.dto.PaymentRequestDTO;
 import org.lib.subscriptionservice.entity.Payment;
 import org.lib.subscriptionservice.entity.PaymentStatus;
 import org.lib.subscriptionservice.service.IPaymentService;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/payment")
@@ -21,7 +24,8 @@ public class PaymentController {
 
     @PostMapping("/")
     public PaymentStatus createPayment(@RequestBody PaymentRequestDTO paymentRequestDTO) {
-        Payment payment = paymentService.createPayment(paymentRequestDTO);
+        UUID userId = (UUID) SecurityContextHolder.getContext().getAuthentication().getDetails();
+        Payment payment = paymentService.createPayment(paymentRequestDTO, userId);
         return payment.getPaymentStatus();
     }
 }

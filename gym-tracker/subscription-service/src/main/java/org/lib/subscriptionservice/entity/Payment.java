@@ -26,9 +26,9 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private UUID paymentId;
 
-    private Long userId;
+    private UUID userId;
 
-    private Long subscriptionPlanId;
+    private UUID subscriptionPlanId;
 
     private BigDecimal amount;
 

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class PaymentService implements IPaymentService {
@@ -21,12 +22,13 @@ public class PaymentService implements IPaymentService {
     }
 
     @Transactional
-    public Payment createPayment(PaymentRequestDTO paymentRequestDTO) {
+    public Payment createPayment(PaymentRequestDTO paymentRequestDTO, UUID userId) {
         //Тут должно быть проверка и списание средств!!
-        boolean paymentSuccess = true;
+        int random = (int) (Math.random() * 10);
+        boolean paymentSuccess = random > 2;
 
         Payment payment = Payment.builder()
-                .userId(paymentRequestDTO.getUserId())
+                .userId(userId)
                 .amount(paymentRequestDTO.getAmount())
                 .paymentDate(LocalDateTime.now())
                 .paymentStatus(paymentSuccess ? PaymentStatus.SUCCESS : PaymentStatus.FAILED)

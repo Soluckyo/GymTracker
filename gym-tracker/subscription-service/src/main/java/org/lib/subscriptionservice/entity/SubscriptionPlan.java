@@ -9,6 +9,8 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Entity
 @Getter
 @Setter
@@ -16,7 +18,7 @@ public class SubscriptionPlan {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String subscriptionPlanId;
+    private UUID subscriptionPlanId;
 
     private String planName;
 

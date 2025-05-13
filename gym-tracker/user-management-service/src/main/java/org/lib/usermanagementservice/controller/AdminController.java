@@ -49,7 +49,7 @@ public class AdminController {
         return ResponseEntity.ok(usersPage);
     }
 
-    //TODO: переделать на логику поиска по телефону
+    //TODO: переделать на логику поиска по телефону и отдавать DTO
     @Operation(
             summary = "Получение пользователя",
             description = "Получает из базы пользователя и отдает в виде User, принимает email"

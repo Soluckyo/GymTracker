@@ -4,11 +4,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Getter
 @Setter
 public class PaymentRequestDTO {
-    private Long userId;
     private Long subscriptionPlanId;
     private BigDecimal amount;
 }
