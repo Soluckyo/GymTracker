@@ -44,7 +44,7 @@ public class UserService implements IUserService {
         authUser.setEmail(registrationUser.getEmail());
         authUser.setPassword(passwordEncoder.encode(registrationUser.getPassword()));
         authUser.setRole("USER");
-        authUser.setExternalUserId(registrationUser.getUserId());
+        authUser.setExternalUserId(savedUser.getUserId());
 
         authClient.registerAppUser(authUser);
 

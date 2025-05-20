@@ -21,9 +21,10 @@ public class SubscriptionPlanController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<String> createSubscriptionPlan(@RequestBody CreateSubscriptionPlanDto subscriptionPlan) {
-        subscriptionPlanService.createSubscriptionPlan(subscriptionPlan);
-        return new ResponseEntity<>("Новый тарифный план создан!", HttpStatus.CREATED);
+    public ResponseEntity<CreateSubscriptionPlanDto> createSubscriptionPlan(@RequestBody CreateSubscriptionPlanDto subscriptionPlan) {
+        CreateSubscriptionPlanDto returnDto =
+                subscriptionPlanService.createSubscriptionPlan(subscriptionPlan);
+        return new ResponseEntity<>(returnDto, HttpStatus.CREATED);
     }
 
     @PutMapping("/change-status")

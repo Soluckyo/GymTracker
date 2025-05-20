@@ -42,7 +42,7 @@ public class TrainerService implements ITrainerService {
         authUser.setEmail(registrationTrainer.getEmail());
         authUser.setPassword(passwordEncoder.encode(registrationTrainer.getPassword()));
         authUser.setRole("TRAINER");
-        authUser.setExternalUserId(registrationTrainer.getTrainerId());
+        authUser.setExternalUserId(savedTrainer.getTrainerId());
 
         authClient.registerAppUser(authUser);
 

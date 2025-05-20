@@ -54,7 +54,7 @@ public class AdminService implements IAdminService {
         authUser.setEmail(registrationAdmin.getEmail());
         authUser.setPassword(passwordEncoder.encode(registrationAdmin.getPassword()));
         authUser.setRole("ADMIN");
-        authUser.setExternalUserId(registrationAdmin.getId());
+        authUser.setExternalUserId(savedAdmin.getAdminId());
 
         authClient.registerAppUser(authUser);
 

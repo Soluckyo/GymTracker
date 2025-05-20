@@ -13,8 +13,6 @@ import org.lib.subscriptionservice.exception.SubscriptionPlanNotFoundException;
 import org.lib.subscriptionservice.repository.SubscriptionPlanRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
 public class SubscriptionPlanService implements ISubscriptionPlanService {
 
@@ -25,7 +23,7 @@ public class SubscriptionPlanService implements ISubscriptionPlanService {
     }
 
 
-    public SubscriptionPlan createSubscriptionPlan(CreateSubscriptionPlanDto dto) {
+    public CreateSubscriptionPlanDto createSubscriptionPlan(CreateSubscriptionPlanDto dto) {
         switch(dto.getType()){
             case LIMITED:
                 if(dto.getVisitLimit() == null || dto.getVisitLimit() <= 0){
@@ -53,8 +51,19 @@ public class SubscriptionPlanService implements ISubscriptionPlanService {
                 .cost(dto.getCost())
                 .status(Status.ACTIVE)
                 .build();
+        SubscriptionPlan savedPlan = subscriptionPlanRepository.save(subscriptionPlan);
 
-        return subscriptionPlanRepository.save(subscriptionPlan);
+        CreateSubscriptionPlanDto createDto = CreateSubscriptionPlanDto.builder()
+                .planId(savedPlan.getSubscriptionPlanId())
+                .planName(savedPlan.getPlanName())
+                .type(savedPlan.getType())
+                .durationPlan(savedPlan.getDurationPlan())
+                .visitLimit(savedPlan.getVisitLimit())
+                .cost(savedPlan.getCost())
+                .planStatus(savedPlan.getStatus())
+                .build();
+
+        return createDto;
     }
 
     public Status changeStatusOfSubscriptionPlan(ChangeStatusOfSubscriptionPlanDto dto) {

@@ -10,6 +10,7 @@ import org.lib.subscriptionservice.entity.Status;
 import org.lib.subscriptionservice.entity.SubscriptionType;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateSubscriptionPlanDto {
+    private UUID planId;
     private String planName;
     private Integer visitLimit;
     private BigDecimal cost;
