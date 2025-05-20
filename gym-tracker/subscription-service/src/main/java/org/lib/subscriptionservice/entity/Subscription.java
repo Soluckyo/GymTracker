@@ -1,5 +1,6 @@
 package org.lib.subscriptionservice.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -12,9 +13,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import java.time.LocalDateTime;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -25,7 +27,9 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Subscription {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
+    @JdbcTypeCode(SqlTypes.UUID)
+    @Column(name = "subscription_id", updatable = false, nullable = false)
     private UUID subscriptionId;
 
     @ManyToOne
@@ -33,9 +37,9 @@ public class Subscription {
 
     private UUID userId;
 
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 
     @Enumerated(EnumType.STRING)
     private Status status;

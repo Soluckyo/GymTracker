@@ -29,7 +29,7 @@ public class TrainerService implements ITrainerService {
             throw new EmailAlreadyExistsException("Такой Email уже используется");
         }
         Trainer trainer = Trainer.builder()
-                .id(registrationTrainer.getId())
+                .trainerId(registrationTrainer.getTrainerId())
                 .name(registrationTrainer.getName())
                 .email(registrationTrainer.getEmail())
                 .password(passwordEncoder.encode(registrationTrainer.getPassword()))
@@ -42,7 +42,7 @@ public class TrainerService implements ITrainerService {
         authUser.setEmail(registrationTrainer.getEmail());
         authUser.setPassword(passwordEncoder.encode(registrationTrainer.getPassword()));
         authUser.setRole("TRAINER");
-        authUser.setExternalUserId(registrationTrainer.getId());
+        authUser.setExternalUserId(registrationTrainer.getTrainerId());
 
         authClient.registerAppUser(authUser);
 

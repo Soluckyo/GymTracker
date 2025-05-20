@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,17 +35,21 @@ public class SubscriptionService implements ISubscriptionService {
         SubscriptionPlan plan = subscriptionPlanRepository.findById(payment.getSubscriptionPlanId())
                 .orElseThrow(() -> new SubscriptionPlanNotFoundException("Не найден тарифный план!"));
 
-        //TODO: доделать дату окончания абонемента
+        LocalDate now = LocalDate.now();
+
         Subscription subscription = Subscription.builder()
                 .subscriptionPlan(plan)
                 .userId(payment.getUserId())
                 .status(Status.ACTIVE)
-                .startDate(LocalDateTime.now())
+                .startDate(now)
+                .endDate(plan.getDurationPlan().calculateEndDate(now))
                 .build();
 
         subscriptionRepository.save(subscription);
         return subscription;
     }
+
+
 
     public Subscription updateStatusSubscription(UUID subscriptionId, Status status) {
         return null;
@@ -79,13 +83,12 @@ public class SubscriptionService implements ISubscriptionService {
         Subscription subscription = subscriptionRepository.findByUserId(userId).orElseThrow(
                 () -> new SubscriptionNotFoundException("Абонемент не найден!"));
 
-        //TODO: доделать конечную дату
         return InfoSubscriptionDto.builder()
                 .status(subscription.getStatus())
                 .startDate(subscription.getStartDate())
                 .endDate(subscription.getEndDate())
                 .namePlan(subscription.getSubscriptionPlan().getPlanName())
-                .duration(subscription.getSubscriptionPlan().getDuration())
+                .duration(subscription.getSubscriptionPlan().getDurationPlan().toString())
                 .build();
     }
 

@@ -13,8 +13,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -25,8 +28,10 @@ import java.time.LocalDateTime;
 public class RefreshToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue
+    @JdbcTypeCode(SqlTypes.UUID)
+    @Column(name = "refresh_token_id", updatable = false, nullable = false)
+    private UUID refreshTokenId;
 
     @Column(nullable = false, unique = true)
     private String token;

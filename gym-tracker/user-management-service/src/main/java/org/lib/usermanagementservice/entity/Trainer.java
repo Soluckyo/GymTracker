@@ -11,6 +11,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.UUID;
 
@@ -23,7 +25,9 @@ import java.util.UUID;
 public class Trainer {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
+    @JdbcTypeCode(SqlTypes.UUID)
+    @Column(name = "trainer_id", updatable = false, nullable = false)
     private UUID trainerId;
 
     @Column(nullable = false, unique = true)
@@ -39,5 +43,5 @@ public class Trainer {
 
     private String workExperience;
 
-    private Long ScheduleId;
+    private UUID scheduleId;
 }

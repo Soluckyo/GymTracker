@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface SubscriptionRepository extends JpaRepository<Subscription, Long> {
+public interface SubscriptionRepository extends JpaRepository<Subscription, UUID> {
     Optional<Subscription> findByUserId(UUID userId);
     Page<Subscription> findBySubscriptionPlanIn(List<SubscriptionPlan> activePlan, Pageable pageable);
     boolean existsById(UUID subscriptionId);

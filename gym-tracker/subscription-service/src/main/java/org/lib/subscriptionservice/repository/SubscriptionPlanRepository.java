@@ -10,11 +10,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface SubscriptionPlanRepository extends JpaRepository<SubscriptionPlan, Long> {
+public interface SubscriptionPlanRepository extends JpaRepository<SubscriptionPlan, UUID> {
 
     List<SubscriptionPlan> findByStatusContains(Status status);
 
     Optional<SubscriptionPlan> findById(UUID subscriptionPlanId);
-
-    Status changeStatusOfSubscriptionPlan(Status status, UUID planId);
 }

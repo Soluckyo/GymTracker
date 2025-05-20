@@ -1,5 +1,6 @@
 package org.lib.subscriptionservice.service;
 
+import org.lib.subscriptionservice.dto.ChangeStatusOfSubscriptionPlanDto;
 import org.lib.subscriptionservice.dto.CreateSubscriptionPlanDto;
 import org.lib.subscriptionservice.entity.Duration;
 import org.lib.subscriptionservice.entity.Status;
@@ -7,6 +8,8 @@ import org.lib.subscriptionservice.entity.SubscriptionPlan;
 import org.lib.subscriptionservice.exception.IllegalDurationException;
 import org.lib.subscriptionservice.exception.IllegalSubscriptionType;
 import org.lib.subscriptionservice.exception.IllegalVisitLimitException;
+import org.lib.subscriptionservice.exception.StatusAlreadySetException;
+import org.lib.subscriptionservice.exception.SubscriptionPlanNotFoundException;
 import org.lib.subscriptionservice.repository.SubscriptionPlanRepository;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +45,7 @@ public class SubscriptionPlanService implements ISubscriptionPlanService {
                 throw new IllegalSubscriptionType("Неизвестный тип абонемента!");
         }
 
-        return SubscriptionPlan.builder()
+        SubscriptionPlan subscriptionPlan = SubscriptionPlan.builder()
                 .planName(dto.getPlanName())
                 .type(dto.getType())
                 .durationPlan(dto.getDurationPlan())
@@ -50,9 +53,18 @@ public class SubscriptionPlanService implements ISubscriptionPlanService {
                 .cost(dto.getCost())
                 .status(Status.ACTIVE)
                 .build();
+
+        return subscriptionPlanRepository.save(subscriptionPlan);
     }
 
-    public Status changeStatusOfSubscriptionPlan(Status status, UUID planId) {
-        return null;
+    public Status changeStatusOfSubscriptionPlan(ChangeStatusOfSubscriptionPlanDto dto) {
+        SubscriptionPlan plan = subscriptionPlanRepository.findById(dto.getPlanId()).orElseThrow(
+                () -> new SubscriptionPlanNotFoundException("Тарифный план не найден!"));
+        Status status = Status.valueOf(dto.getStatus());
+        if(plan.getStatus().equals(status)){
+            throw new StatusAlreadySetException("Установленный статус не должен соответствовать новому статусу!");
+        }
+        plan.setStatus(status);
+        return plan.getStatus();
     }
 }
