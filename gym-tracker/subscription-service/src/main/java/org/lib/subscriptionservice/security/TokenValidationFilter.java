@@ -1,10 +1,12 @@
 package org.lib.subscriptionservice.security;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.lib.subscriptionservice.dto.JwtValidationResponse;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -21,10 +23,13 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
+@Slf4j
 public class TokenValidationFilter extends OncePerRequestFilter {
 
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    private UsernamePasswordAuthenticationToken authenticationToken;
+
 
     public TokenValidationFilter(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
@@ -58,27 +63,44 @@ public class TokenValidationFilter extends OncePerRequestFilter {
                     String.class
             );
 
+            log.info(validationResponse.getBody());
+            log.info(validationResponse.getStatusCode().toString());
+
             //если токен валиден то, кладем в контекст пользователя
             if(validationResponse.getStatusCode().is2xxSuccessful()) {
-                String body = validationResponse.getBody();
-                JwtValidationResponse jwtInfo = objectMapper.readValue(body, JwtValidationResponse.class);
-                List<SimpleGrantedAuthority> authorities = List.of(
-                        new SimpleGrantedAuthority("ROLE_" + jwtInfo.getRole())
-                );
-
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        jwtInfo.getEmail(), null, authorities
-                );
-
-                //кладем в контекст информацию о пользователе из токена
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                authenticationToken = prepareAuthenticationToken(validationResponse);
             }
+
+            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             filterChain.doFilter(request, response);
 
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
 
+    }
+
+    public UsernamePasswordAuthenticationToken prepareAuthenticationToken(ResponseEntity<String> validationResponse) {
+        String body = validationResponse.getBody();
+        JwtValidationResponse jwtInfo = null;
+        try {
+            jwtInfo = objectMapper.readValue(body, JwtValidationResponse.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        List<SimpleGrantedAuthority> authorities = List.of(
+                new SimpleGrantedAuthority("ROLE_" + jwtInfo.getRole())
+        );
+
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                jwtInfo.getEmail(), null, authorities
+        );
+
+
+        authenticationToken.setDetails(jwtInfo.getUserId());
+
+        return authenticationToken;
     }
 }
 

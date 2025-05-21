@@ -43,4 +43,16 @@ public class Subscription {
 
     @Enumerated(EnumType.STRING)
     private Status status;
+
+    @Override
+    public String toString() {
+        return "Subscription{" +
+                "subscriptionId=" + subscriptionId +
+                ", subscriptionPlan=" + subscriptionPlan +
+                ", userId=" + userId +
+                ", startDate=" + startDate +
+                ", endDate=" + endDate +
+                ", status=" + status +
+                '}';
+    }
 }

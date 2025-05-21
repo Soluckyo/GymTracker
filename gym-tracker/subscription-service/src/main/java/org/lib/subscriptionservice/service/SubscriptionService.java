@@ -1,5 +1,6 @@
 package org.lib.subscriptionservice.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.lib.subscriptionservice.dto.InfoSubscriptionDto;
 import org.lib.subscriptionservice.entity.Payment;
 import org.lib.subscriptionservice.entity.Status;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class SubscriptionService implements ISubscriptionService {
 
@@ -32,9 +34,16 @@ public class SubscriptionService implements ISubscriptionService {
 
     @Transactional(propagation = Propagation.MANDATORY)
     public Subscription createSubscriptionFromPayment(Payment payment) {
+        log.info("Зашел в метод создания абонемента");
+        log.info("Платежка: {}", payment);
+        if (payment.getSubscriptionPlanId() == null) {
+            throw new SubscriptionPlanNotFoundException("subscriptionPlanId не был передан");
+        }
+
         SubscriptionPlan plan = subscriptionPlanRepository.findById(payment.getSubscriptionPlanId())
                 .orElseThrow(() -> new SubscriptionPlanNotFoundException("Не найден тарифный план!"));
 
+        log.info("Прошел поиск тарифа: {}", plan);
         LocalDate now = LocalDate.now();
 
         Subscription subscription = Subscription.builder()
@@ -44,6 +53,8 @@ public class SubscriptionService implements ISubscriptionService {
                 .startDate(now)
                 .endDate(plan.getDurationPlan().calculateEndDate(now))
                 .build();
+
+        log.info("Прошло создание абонемента: {}", subscription);
 
         subscriptionRepository.save(subscription);
         return subscription;

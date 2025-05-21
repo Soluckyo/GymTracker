@@ -47,4 +47,16 @@ public class SubscriptionPlan {
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Override
+    public String toString() {
+        return "SubscriptionPlan{" +
+                "subscriptionPlanId=" + subscriptionPlanId +
+                ", planName='" + planName + '\'' +
+                ", type=" + type +
+                ", durationPlan=" + durationPlan +
+                ", visitLimit=" + visitLimit +
+                ", cost=" + cost +
+                ", status=" + status +
+                '}';
+    }
 }

@@ -80,53 +80,50 @@ public class JwtService implements IJwtService {
     }
 
     //проверка правильности токена
+    /**
+     * Валидирует токен
+     *
+     * @param token токен доступа или токен обновления
+     * @return true, если токен валидный
+     *         false, если токен невалидный
+     */
     public Boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder()
-                    .setSigningKey(getSignInKey())
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-            return true;
-        }catch (ExpiredJwtException expEx) {
-                log.error("Token expired", expEx);
-                return false;
-            } catch (UnsupportedJwtException unsEx) {
-                log.error("Unsupported jwt", unsEx);
-                return false;
-            } catch (MalformedJwtException mjEx) {
-                log.error("Malformed jwt", mjEx);
-                return false;
-            } catch (SignatureException sEx) {
-                log.error("Invalid signature", sEx);
-                return false;
-            } catch (Exception e) {
-                log.error("invalid token", e);
-                return false;
-            }
+        claimsFromToken(token);
+        log.debug("Попытка валидировать токен: {}", token);
+        return true;
     }
 
     //Декодирование токена и получение данных
     public ResponseEntity<?> extractUserInfoFromToken(String authHeader) {
         if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+            log.warn("Недопустимый заголовок авторизации: {}", authHeader);
             return ResponseEntity.badRequest().body("Недопустимый заголовок авторизации");
         }
+
+        log.info("Заголовок авторизации: {}", authHeader);
 
         String token = authHeader.substring(7);
 
         if(!validateToken(token)) {
+            log.info("Токен не валиден: {}", token);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Недействительный или просроченный токен");
         }
 
+        log.info("Прошел if");
+
         UUID userId = UUID.fromString(getUserIdFromToken(token));
+        log.info("Получили id из токена: {}", userId);
         String email = getEmailFromToken(token);
+        log.info("Получили email из токена: {}", email);
         String role = getRoleFromToken(token);
+        log.info("Получили из role токена: {}", role);
 
         TokenValidationResponse tokenValidationResponse = new TokenValidationResponse();
         tokenValidationResponse.setUserId(userId);
         tokenValidationResponse.setEmail(email);
         tokenValidationResponse.setRole(role);
 
+        log.info("Данные отправлены: {}", tokenValidationResponse);
         return ResponseEntity.ok(tokenValidationResponse);
     }
 

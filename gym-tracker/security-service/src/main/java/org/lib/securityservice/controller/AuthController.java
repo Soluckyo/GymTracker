@@ -3,6 +3,7 @@ package org.lib.securityservice.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.lib.securityservice.dto.JwtRequestDTO;
 import org.lib.securityservice.dto.JwtResponseDTO;
 import org.lib.securityservice.dto.RefreshTokenDTO;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.naming.AuthenticationException;
 
+@Slf4j
 @RestController
 @RequestMapping("/auth")
 @Tag(name = "auth_controller")

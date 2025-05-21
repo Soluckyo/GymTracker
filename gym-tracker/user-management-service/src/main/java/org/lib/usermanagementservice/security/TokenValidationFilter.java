@@ -62,9 +62,9 @@ public class TokenValidationFilter extends OncePerRequestFilter {
             //если токен валиден то, кладем в контекст пользователя
             if(validationResponse.getStatusCode().is2xxSuccessful()) {
                 authenticationToken = prepareAuthenticationToken(validationResponse);
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
 
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             filterChain.doFilter(request, response);
 
         } catch (Exception e) {

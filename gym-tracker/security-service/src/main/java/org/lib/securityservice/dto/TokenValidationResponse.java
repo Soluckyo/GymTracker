@@ -24,5 +24,8 @@ public class TokenValidationResponse {
     @Schema(description = "роль", example = "ROLE_ADMIN")
     private String role;
 
-
+    @Override
+    public String toString() {
+        return "UUID: " + userId + ", email: " + email + ", role: " + role;
+    }
 }

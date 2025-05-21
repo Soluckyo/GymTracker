@@ -2,6 +2,8 @@ package org.lib.subscriptionservice.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
@@ -38,5 +40,11 @@ public class Payment {
 
     private LocalDateTime paymentDate;
 
+    @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
+
+    @Override
+    public String toString() {
+        return "paymentId " + paymentId + " userId " + userId + " subscriptionPlanId " + subscriptionPlanId + " amount " + amount;
+    }
 }
