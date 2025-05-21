@@ -34,7 +34,7 @@ public class PaymentService implements IPaymentService {
         Payment payment = Payment.builder()
                 .userId(userId)
                 .amount(paymentRequestDTO.getAmount())
-             //   .subscriptionPlanId(paymentRequestDTO.getSubscriptionPlanId())
+                .subscriptionPlanId(paymentRequestDTO.getSubscriptionPlanId())
                 .paymentDate(LocalDateTime.now())
                 .paymentStatus(paymentSuccess ? PaymentStatus.SUCCESS : PaymentStatus.FAILED)
                 .build();
