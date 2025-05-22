@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -33,6 +32,8 @@ public class SubscriptionService implements ISubscriptionService {
         this.subscriptionPlanRepository = subscriptionPlanRepository;
     }
 
+
+    //TODO: продумать логику даты абонементов с определенным кол-вом занятий
     @Transactional(propagation = Propagation.MANDATORY)
     public Subscription createSubscriptionFromPayment(Payment payment) {
         log.info("Зашел в метод 'createSubscriptionFromPayment'");
@@ -40,7 +41,7 @@ public class SubscriptionService implements ISubscriptionService {
         if (payment.getSubscriptionPlanId() == null) {
             throw new SubscriptionPlanNotFoundException("subscriptionPlanId не был передан");
         }
-        if(subscriptionRepository.findByUserId(payment.getUserId()).isPresent()) {
+        if(subscriptionRepository.findByUserIdAndStatus(payment.getUserId(), Status.ACTIVE).isPresent()){
             throw new UserAlreadyHasActiveSubscriptionException("У пользователя уже есть активная подписка!");
         }
 
@@ -86,24 +87,18 @@ public class SubscriptionService implements ISubscriptionService {
         return subscriptions;
     }
 
-    public Subscription getActiveSubscriptionUser() {
-        List<SubscriptionPlan> activePlan = subscriptionPlanRepository.findByStatusContains(Status.ACTIVE);
-        if(activePlan.isEmpty()) {
-            throw new SubscriptionPlanNotFoundException("Активных тарифных планов не найдено!");
+    public Page<Subscription> getAllSubscriptionsUser(UUID userId, Pageable pageable) {
+        Page<Subscription> subscription = subscriptionRepository.findByUserId(userId, pageable);
+        if(subscription.isEmpty()){
+            throw new SubscriptionNotFoundException("Подписки у данного пользователя отсутствуют");
         }
-        List<Subscription> allUserSubscriptions = subscriptionRepository.findBySubscriptionPlanIn(activePlan, pageable);
-        Subscription activeSubscription = new Subscription();
-        for (Subscription subscription : allUserSubscriptions) {
-            if(subscription.getStatus().equals(Status.ACTIVE)){
-                activeSubscription = subscription;
-            }
-        }
-        return activeSubscription;
+        return subscription;
+
     }
 
-    public InfoSubscriptionDto getInfoSubscription(UUID userId) {
-        Subscription subscription = subscriptionRepository.findByUserId(userId).orElseThrow(
-                () -> new SubscriptionNotFoundException("Абонемент не найден!"));
+    public InfoSubscriptionDto getInfoActiveSubscription(UUID userId) {
+        Subscription subscription = subscriptionRepository.findByUserIdAndStatus(userId, Status.ACTIVE)
+                .orElseThrow(() -> new SubscriptionNotFoundException("У пользователя нет активной подписки"));
 
         return InfoSubscriptionDto.builder()
                 .status(subscription.getStatus())

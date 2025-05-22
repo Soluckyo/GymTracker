@@ -1,5 +1,6 @@
 package org.lib.subscriptionservice.repository;
 
+import org.lib.subscriptionservice.entity.Status;
 import org.lib.subscriptionservice.entity.Subscription;
 import org.lib.subscriptionservice.entity.SubscriptionPlan;
 import org.springframework.data.domain.Page;
@@ -13,8 +14,9 @@ import java.util.UUID;
 
 @Repository
 public interface SubscriptionRepository extends JpaRepository<Subscription, UUID> {
-    Optional<Subscription> findByUserId(UUID userId);
-    List<Subscription> findBySubscriptionPlanIn(List<SubscriptionPlan> activePlan, Pageable pageable);
+    Page<Subscription> findByUserId(UUID userId, Pageable pageable);
+    List<Subscription> findBySubscriptionPlanIn(List<SubscriptionPlan> activePlan);
     boolean existsById(UUID subscriptionId);
     void deleteById(UUID subscriptionId);
+    Optional<Subscription> findByUserIdAndStatus(UUID userId, Status status);
 }
