@@ -8,6 +8,7 @@ import org.lib.subscriptionservice.entity.Subscription;
 import org.lib.subscriptionservice.entity.SubscriptionPlan;
 import org.lib.subscriptionservice.exception.SubscriptionNotFoundException;
 import org.lib.subscriptionservice.exception.SubscriptionPlanNotFoundException;
+import org.lib.subscriptionservice.exception.UserAlreadyHasActiveSubscriptionException;
 import org.lib.subscriptionservice.repository.SubscriptionPlanRepository;
 import org.lib.subscriptionservice.repository.SubscriptionRepository;
 import org.springframework.data.domain.Page;
@@ -34,10 +35,13 @@ public class SubscriptionService implements ISubscriptionService {
 
     @Transactional(propagation = Propagation.MANDATORY)
     public Subscription createSubscriptionFromPayment(Payment payment) {
-        log.info("Зашел в метод создания абонемента");
-        log.info("Платежка: {}", payment);
+        log.info("Зашел в метод 'createSubscriptionFromPayment'");
+        log.info("Платеж: {}", payment);
         if (payment.getSubscriptionPlanId() == null) {
             throw new SubscriptionPlanNotFoundException("subscriptionPlanId не был передан");
+        }
+        if(subscriptionRepository.findByUserId(payment.getUserId()).isPresent()) {
+            throw new UserAlreadyHasActiveSubscriptionException("У пользователя уже есть активная подписка!");
         }
 
         SubscriptionPlan plan = subscriptionPlanRepository.findById(payment.getSubscriptionPlanId())
@@ -82,12 +86,19 @@ public class SubscriptionService implements ISubscriptionService {
         return subscriptions;
     }
 
-    public Page<Subscription> getAllActiveSubscriptionsUser(Pageable pageable) {
+    public Subscription getActiveSubscriptionUser() {
         List<SubscriptionPlan> activePlan = subscriptionPlanRepository.findByStatusContains(Status.ACTIVE);
-        if(!activePlan.isEmpty()) {
+        if(activePlan.isEmpty()) {
             throw new SubscriptionPlanNotFoundException("Активных тарифных планов не найдено!");
         }
-        return subscriptionRepository.findBySubscriptionPlanIn(activePlan, pageable);
+        List<Subscription> allUserSubscriptions = subscriptionRepository.findBySubscriptionPlanIn(activePlan, pageable);
+        Subscription activeSubscription = new Subscription();
+        for (Subscription subscription : allUserSubscriptions) {
+            if(subscription.getStatus().equals(Status.ACTIVE)){
+                activeSubscription = subscription;
+            }
+        }
+        return activeSubscription;
     }
 
     public InfoSubscriptionDto getInfoSubscription(UUID userId) {

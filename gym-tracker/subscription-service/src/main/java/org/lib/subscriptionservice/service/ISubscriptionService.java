@@ -13,7 +13,7 @@ public interface ISubscriptionService {
     Subscription createSubscriptionFromPayment(Payment payment);
     boolean deleteSubscription(UUID subscriptionId);
     Page<Subscription> getAllSubscriptionsAdmin(Pageable pageable);
-    Page<Subscription> getAllActiveSubscriptionsUser(Pageable pageable);
+    Subscription getActiveSubscriptionUser();
     InfoSubscriptionDto getInfoSubscription(UUID userId);
     Subscription updateStatusSubscription(UUID subscriptionId, Status status);
 }

@@ -38,12 +38,8 @@ public class SubscriptionController {
     }
 
     @GetMapping("/active")
-    public Page<Subscription> getActiveSubscriptionsUser(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "5") int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size);
-        return subscriptionService.getAllActiveSubscriptionsUser(pageable);
+    public Subscription getActiveSubscriptionsUser() {
+        return subscriptionService.getActiveSubscriptionUser();
     }
 
     @GetMapping("/info")

@@ -52,6 +52,11 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
 
+    @ExceptionHandler(UserAlreadyHasActiveSubscriptionException.class)
+    public ResponseEntity<ErrorResponse> handleUserAlreadyHasActiveSubscription(UserAlreadyHasActiveSubscriptionException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.CONFLICT, ex.getMessage(), request);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex, HttpServletRequest request) {
         ex.printStackTrace(); // вывод в консоль
