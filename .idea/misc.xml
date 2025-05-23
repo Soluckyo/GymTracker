@@ -6,6 +6,7 @@
       <list>
         <option value="$PROJECT_DIR$/gym-tracker/pom.xml" />
         <option value="$PROJECT_DIR$/gym-tracker/subscription-service/pom.xml" />
+        <option value="$PROJECT_DIR$/gym-tracker/training-service/pom.xml" />
       </list>
     </option>
   </component>

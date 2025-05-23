@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
         <module name="eureka-server" />
+        <module name="training-service" />
       </profile>
       <profile name="Annotation profile for gym-tracker" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -38,6 +39,7 @@
       <module name="gym-tracker" options="-parameters" />
       <module name="security-service" options="-parameters" />
       <module name="subscription-service" options="-parameters" />
+      <module name="training-service" options="-parameters" />
       <module name="user-management-service" options="-parameters" />
     </option>
   </component>

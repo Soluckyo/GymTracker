@@ -19,6 +19,7 @@
 		<module>api-gateway</module>
 		<module>security-service</module>
 		<module>user-management-service</module>
+		<module>training-service</module>
     </modules>
 	<url/>
 	<licenses>
