@@ -11,8 +11,8 @@ public class TrainingMapper {
         dto.setTrainerId(training.getTrainerId());
         dto.setTrainingType(training.getType().toString());
         dto.setDuration(training.getDuration());
-        dto.setTrainingStartDate(training.getStartDate());
-        dto.setTrainingEndDate(training.getStartDate().plus(training.getDuration()));
+        dto.setTrainingStartDate(training.getStartTime());
+        dto.setTrainingEndDate(training.getEndTime());
 
         return dto;
     }

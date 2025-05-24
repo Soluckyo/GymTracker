@@ -43,7 +43,12 @@ public class Training {
     @Enumerated(EnumType.STRING)
     private TrainingType type;
 
-    private LocalDateTime startDate;
+    private LocalDateTime startTime;
+
+    private LocalDateTime endTime;
+
+    @Enumerated(EnumType.STRING)
+    private Room room;
 
     @Convert(converter = DurationAttributeConverter.class)
     private Duration duration;

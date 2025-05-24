@@ -3,15 +3,20 @@ package org.lib.trainingservice.service;
 import org.lib.trainingservice.dto.CreateTrainingDto;
 import org.lib.trainingservice.dto.SignUpForTrainingDto;
 import org.lib.trainingservice.dto.TrainingDTO;
+import org.lib.trainingservice.entity.Room;
 import org.lib.trainingservice.entity.Training;
 import org.lib.trainingservice.entity.TrainingType;
 import org.lib.trainingservice.exception.TrainingNotFoundException;
+import org.lib.trainingservice.exception.TrainingOverlapException;
 import org.lib.trainingservice.mapper.TrainingMapper;
 import org.lib.trainingservice.repository.TrainingRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -56,30 +61,62 @@ public class TrainingService implements ITrainingService {
     }
 
 
-    //TODO: Продумать на счет залов?, ограничения кол-ва групповых тренировок в одно и тоже время
     @Override
+    @Transactional
     public TrainingDTO createGroupTraining(CreateTrainingDto createTrainingDto) {
+
+        LocalDateTime startTime = createTrainingDto.getStartTime();
+        LocalDateTime endTime = startTime.plus(createTrainingDto.getDuration());
+        Room room = createTrainingDto.getRoom();
+
+        List<Training> overlappingFromTrainer = trainingRepository.findOverlappingTrainingsForTrainer(
+                createTrainingDto.getTrainingId(), startTime, endTime);
+        if(!overlappingFromTrainer.isEmpty()) {
+            throw new TrainingOverlapException("У тренера в это время уже есть тренировка!");
+        }
+
+        List<Training> overlapping = trainingRepository.findOverlappingTrainings(
+                startTime, endTime, TrainingType.GROUP, room);
+        if(!overlapping.isEmpty()){
+            throw new TrainingOverlapException("В это время уже есть групповая тренировка!");
+        }
+
         Training training = new Training();
         training.setType(TrainingType.GROUP);
         training.setTitle(createTrainingDto.getTitle());
         training.setTrainingId(createTrainingDto.getTrainingId());
-        training.setStartDate(createTrainingDto.getStartTime());
+        training.setRoom(createTrainingDto.getRoom());
+        training.setStartTime(createTrainingDto.getStartTime());
+        training.setEndTime(training.getStartTime().plus(training.getDuration()));
         training.setDuration(createTrainingDto.getDuration());
-        return null;
+
+        Training savedTraining = trainingRepository.save(training);
+        return TrainingMapper.toTrainingDTO(savedTraining);
     }
 
-    //TODO: продумать логику проверки доступности тренера!
     @Override
     public TrainingDTO createPersonalTraining(CreateTrainingDto createTrainingDto) {
+        LocalDateTime startTime = createTrainingDto.getStartTime();
+        LocalDateTime endTime = startTime.plus(createTrainingDto.getDuration());
+
+        List<Training> overlappingFromTrainer = trainingRepository.findOverlappingTrainingsForTrainer(
+                createTrainingDto.getTrainingId(), startTime, endTime);
+        if(!overlappingFromTrainer.isEmpty()) {
+            throw new TrainingOverlapException("У тренера в это время уже есть тренировка!");
+        }
+
         Training training = new Training();
         training.setType(TrainingType.PERSONAL);
         //TODO: добавить возможность получения имени тренера!
         training.setTitle("Персональная тренировка с тренером" + createTrainingDto.getTitle() );
         training.setTrainingId(createTrainingDto.getTrainingId());
-        training.setStartDate(createTrainingDto.getStartTime());
+        training.setStartTime(createTrainingDto.getStartTime());
+        training.setEndTime(training.getStartTime().plus(training.getDuration()));
         training.setDuration(createTrainingDto.getDuration());
+        training.setRoom(Room.COMMON_ROOM);
 
-        return null;
+        Training savedTraining = trainingRepository.save(training);
+        return TrainingMapper.toTrainingDTO(savedTraining);
     }
 
     @Override

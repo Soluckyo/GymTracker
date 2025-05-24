@@ -14,18 +14,7 @@ public class TrainingDTO {
     private String trainingTitle;
     private UUID trainerId;
     private String trainingType;
-    private LocalDateTime trainingStartDate;
-    private LocalDateTime trainingEndDate;
+    private LocalDateTime trainingStartTime;
+    private LocalDateTime trainingEndTime;
     private Duration duration;
-
-    public TrainingDTO() {}
-
-    public TrainingDTO(UUID trainingId, String trainingTitle, UUID trainerId, String trainingType, LocalDateTime trainingStartDate, LocalDateTime trainingEndDate) {
-        this.trainingId = trainingId;
-        this.trainingTitle = trainingTitle;
-        this.trainerId = trainerId;
-        this.trainingType = trainingType;
-        this.trainingStartDate = trainingStartDate;
-        this.trainingEndDate = trainingStartDate.plus(duration);
-    }
 }

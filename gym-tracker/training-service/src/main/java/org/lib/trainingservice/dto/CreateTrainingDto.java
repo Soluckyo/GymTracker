@@ -2,6 +2,7 @@ package org.lib.trainingservice.dto;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.lib.trainingservice.entity.Room;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -14,7 +15,5 @@ public class CreateTrainingDto {
     private UUID trainingId;
     private LocalDateTime startTime;
     private Duration duration;
-
-
-
+    private Room room;
 }
