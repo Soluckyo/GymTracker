@@ -31,7 +31,7 @@ public class Training {
     @Column(name = "training_id", nullable = false, updatable = false)
     private UUID trainingId;
 
-    private String trainingTitle;
+    private String title;
 
     @ElementCollection
     @CollectionTable(name = "training_users", joinColumns = @JoinColumn(name = "subscription_id"))
@@ -41,7 +41,7 @@ public class Training {
     private UUID trainerId;
 
     @Enumerated(EnumType.STRING)
-    private TrainingType trainingType;
+    private TrainingType type;
 
     private LocalDateTime startDate;
 
