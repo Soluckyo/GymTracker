@@ -9,7 +9,6 @@
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
         <module name="eureka-server" />
-        <module name="training-service" />
       </profile>
       <profile name="Annotation profile for gym-tracker" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -29,6 +28,15 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
         </processorPath>
         <module name="subscription-service" />
+      </profile>
+      <profile name="Annotation profile for training-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
+        </processorPath>
+        <module name="training-service" />
       </profile>
     </annotationProcessing>
   </component>
