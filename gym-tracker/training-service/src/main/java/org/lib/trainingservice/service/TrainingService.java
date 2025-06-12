@@ -8,6 +8,7 @@ import org.lib.trainingservice.entity.Training;
 import org.lib.trainingservice.entity.TrainingType;
 import org.lib.trainingservice.exception.TrainingNotFoundException;
 import org.lib.trainingservice.exception.TrainingOverlapException;
+import org.lib.trainingservice.kafka.KafkaProducer;
 import org.lib.trainingservice.mapper.TrainingMapper;
 import org.lib.trainingservice.repository.TrainingRepository;
 import org.springframework.data.domain.Page;
@@ -23,9 +24,11 @@ import java.util.UUID;
 public class TrainingService implements ITrainingService {
 
     private final TrainingRepository trainingRepository;
+    private final KafkaProducer kafkaProducer;
 
-    public TrainingService(TrainingRepository trainingRepository) {
+    public TrainingService(TrainingRepository trainingRepository, KafkaProducer kafkaProducer) {
         this.trainingRepository = trainingRepository;
+        this.kafkaProducer = kafkaProducer;
     }
 
     @Override
@@ -116,6 +119,8 @@ public class TrainingService implements ITrainingService {
         training.setRoom(Room.COMMON_ROOM);
 
         Training savedTraining = trainingRepository.save(training);
+        kafkaProducer.sendTrainerInfoRequest(savedTraining.getTrainerId(), savedTraining.getTrainingId());
+
         return TrainingMapper.toTrainingDTO(savedTraining);
     }
 
@@ -126,6 +131,11 @@ public class TrainingService implements ITrainingService {
 
     @Override
     public TrainingDTO signUpForTraining(SignUpForTrainingDto signUpForTrainingDto) {
+        return null;
+    }
+
+    @Override
+    public Training findTrainingById(UUID trainingId) {
         return null;
     }
 }

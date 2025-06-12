@@ -23,7 +23,7 @@ public class PaymentService implements IPaymentService {
         this.subscriptionService = subscriptionService;
     }
 
-    @Transacctional
+    @Transactional
     public Payment createPayment(PaymentRequestDto paymentRequestDTO, UUID userId) {
         //Тут должно быть проверка и списание средств!!
         //int random = (int) (Math.random() * 10);

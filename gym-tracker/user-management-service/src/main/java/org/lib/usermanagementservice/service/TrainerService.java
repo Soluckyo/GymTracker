@@ -5,9 +5,12 @@ import org.lib.usermanagementservice.dto.RegisterAppUserRequest;
 import org.lib.usermanagementservice.dto.RegistrationTrainer;
 import org.lib.usermanagementservice.entity.Trainer;
 import org.lib.usermanagementservice.exception.EmailAlreadyExistsException;
+import org.lib.usermanagementservice.exception.TrainerNotFoundException;
 import org.lib.usermanagementservice.repository.TrainerRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class TrainerService implements ITrainerService {
@@ -47,5 +50,10 @@ public class TrainerService implements ITrainerService {
         authClient.registerAppUser(authUser);
 
         return savedTrainer;
+    }
+
+    public Trainer findTrainerByUUID(UUID uuid) {
+        return trainerRepository.findById(uuid).orElseThrow(
+                () -> new TrainerNotFoundException("Тренер с таким ID не найден"));
     }
 }

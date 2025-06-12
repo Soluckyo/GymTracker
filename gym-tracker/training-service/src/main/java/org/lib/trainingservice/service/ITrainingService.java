@@ -3,6 +3,7 @@ package org.lib.trainingservice.service;
 import org.lib.trainingservice.dto.CreateTrainingDto;
 import org.lib.trainingservice.dto.SignUpForTrainingDto;
 import org.lib.trainingservice.dto.TrainingDTO;
+import org.lib.trainingservice.entity.Training;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -18,6 +19,7 @@ public interface ITrainingService {
     TrainingDTO createPersonalTraining(CreateTrainingDto createTrainingDto);
     void deleteTraining(UUID trainingId);
     TrainingDTO signUpForTraining(SignUpForTrainingDto signUpForTrainingDto);
+    Training findTrainingById(UUID trainingId);
 
 
 

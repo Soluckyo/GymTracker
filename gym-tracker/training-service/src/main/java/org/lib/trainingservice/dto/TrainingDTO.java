@@ -13,6 +13,7 @@ public class TrainingDTO {
     private UUID trainingId;
     private String trainingTitle;
     private UUID trainerId;
+    private String trainerName;
     private String trainingType;
     private LocalDateTime trainingStartTime;
     private LocalDateTime trainingEndTime;

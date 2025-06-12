@@ -40,6 +40,8 @@ public class Training {
 
     private UUID trainerId;
 
+    private String trainerName;
+
     @Enumerated(EnumType.STRING)
     private TrainingType type;
 
