@@ -7,6 +7,7 @@ import org.lib.usermanagementservice.dto.RegistrationAdmin;
 import org.lib.usermanagementservice.dto.RegistrationTrainer;
 import org.lib.usermanagementservice.dto.RegistrationUser;
 import org.lib.usermanagementservice.entity.Admin;
+import org.lib.usermanagementservice.entity.Trainer;
 import org.lib.usermanagementservice.entity.User;
 import org.lib.usermanagementservice.exception.EmailAlreadyExistsException;
 import org.lib.usermanagementservice.repository.AdminRepository;
@@ -76,5 +77,9 @@ public class AdminService implements IAdminService {
     public User getUser(String email) {
         return userRepository.getUserByEmail(email).orElseThrow(
                 () -> new EntityNotFoundException("Пользователь с таким email не найден"));
+    }
+
+    public Page<Trainer> getTrainers(Pageable pageable) {
+        return trainerService.findAll(pageable);
     }
 }

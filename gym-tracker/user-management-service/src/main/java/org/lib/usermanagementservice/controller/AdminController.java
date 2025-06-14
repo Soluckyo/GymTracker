@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.lib.usermanagementservice.dto.RegistrationAdmin;
 import org.lib.usermanagementservice.dto.RegistrationTrainer;
 import org.lib.usermanagementservice.dto.RegistrationUser;
+import org.lib.usermanagementservice.entity.Trainer;
 import org.lib.usermanagementservice.entity.User;
 import org.lib.usermanagementservice.service.AdminService;
 import org.springframework.data.domain.Page;
@@ -61,6 +62,23 @@ public class AdminController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         return ResponseEntity.ok().body(user);
+    }
+
+    @Operation(
+            summary = "Получение всех тренеров",
+            description = "Получает из базы все задачи и отдает в виде Page<Trainers>, ничего не принимает"
+    )
+    @GetMapping("/trainers")
+    public ResponseEntity<Page<Trainer>> getTrainers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size
+    ){
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Trainer> trainersPage = adminService.getTrainers(pageable);
+        if (trainersPage.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.ok(trainersPage);
     }
 
     //TODO: добавить проверку на ошибки

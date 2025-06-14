@@ -12,7 +12,7 @@ import java.util.UUID;
 @Setter
 public class CreateTrainingDto {
     private String title;
-    private UUID trainingId;
+    private UUID trainerId;
     private LocalDateTime startTime;
     private Duration duration;
     private Room room;

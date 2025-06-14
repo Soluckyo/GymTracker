@@ -73,7 +73,7 @@ public class TrainingService implements ITrainingService {
         Room room = createTrainingDto.getRoom();
 
         List<Training> overlappingFromTrainer = trainingRepository.findOverlappingTrainingsForTrainer(
-                createTrainingDto.getTrainingId(), startTime, endTime);
+                createTrainingDto.getTrainerId(), startTime, endTime);
         if(!overlappingFromTrainer.isEmpty()) {
             throw new TrainingOverlapException("У тренера в это время уже есть тренировка!");
         }
@@ -87,7 +87,7 @@ public class TrainingService implements ITrainingService {
         Training training = new Training();
         training.setType(TrainingType.GROUP);
         training.setTitle(createTrainingDto.getTitle());
-        training.setTrainingId(createTrainingDto.getTrainingId());
+        training.setTrainingId(createTrainingDto.getTrainerId());
         training.setRoom(createTrainingDto.getRoom());
         training.setStartTime(createTrainingDto.getStartTime());
         training.setEndTime(training.getStartTime().plus(training.getDuration()));
@@ -103,7 +103,7 @@ public class TrainingService implements ITrainingService {
         LocalDateTime endTime = startTime.plus(createTrainingDto.getDuration());
 
         List<Training> overlappingFromTrainer = trainingRepository.findOverlappingTrainingsForTrainer(
-                createTrainingDto.getTrainingId(), startTime, endTime);
+                createTrainingDto.getTrainerId(), startTime, endTime);
         if(!overlappingFromTrainer.isEmpty()) {
             throw new TrainingOverlapException("У тренера в это время уже есть тренировка!");
         }
@@ -112,7 +112,7 @@ public class TrainingService implements ITrainingService {
         training.setType(TrainingType.PERSONAL);
         //TODO: добавить возможность получения имени тренера!
         training.setTitle("Персональная тренировка с тренером" + createTrainingDto.getTitle() );
-        training.setTrainingId(createTrainingDto.getTrainingId());
+        training.setTrainerId(createTrainingDto.getTrainerId());
         training.setStartTime(createTrainingDto.getStartTime());
         training.setEndTime(training.getStartTime().plus(training.getDuration()));
         training.setDuration(createTrainingDto.getDuration());

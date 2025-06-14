@@ -7,6 +7,8 @@ import org.lib.usermanagementservice.entity.Trainer;
 import org.lib.usermanagementservice.exception.EmailAlreadyExistsException;
 import org.lib.usermanagementservice.exception.TrainerNotFoundException;
 import org.lib.usermanagementservice.repository.TrainerRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -55,5 +57,9 @@ public class TrainerService implements ITrainerService {
     public Trainer findTrainerByUUID(UUID uuid) {
         return trainerRepository.findById(uuid).orElseThrow(
                 () -> new TrainerNotFoundException("Тренер с таким ID не найден"));
+    }
+
+    public Page<Trainer> findAll(Pageable pageable) {
+        return trainerRepository.findAll(pageable);
     }
 }
