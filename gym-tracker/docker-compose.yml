@@ -4,14 +4,14 @@ services:
     image: eureka-server
     container_name: eureka-server
     ports:
-      - "8080:8080"
+      - "8761:8761"
     volumes:
       - .:/app
     networks:
       - backend
     environment:
       - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
-        - EUREKA_CLIENT_FETCH_REGISTRY=false
+      - EUREKA_CLIENT_FETCH_REGISTRY=false
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: always
@@ -22,7 +22,7 @@ services:
     image: api-gateway
     container_name: api-gateway
     ports:
-      - "8080:8080"
+      - "8082:8080"
     depends_on:
       - eureka-server
     networks:
@@ -33,8 +33,6 @@ services:
     build: ./security-service
     image: security-service
     container_name: security-service
-    ports:
-      - "8080"
     depends_on:
       - eureka-server
       - postgres-security
@@ -50,13 +48,11 @@ services:
     build: ./subscription-service
     image: subscription-service
     container_name: subscription-service
-    ports:
-      - "8080"
     depends_on:
       - eureka-server
       - postgres-subscription
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-security:5432/subscription-db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-subscription:5432/subscription-db
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
     networks:
@@ -67,14 +63,12 @@ services:
     build: ./user-management-service
     image: user-management-service
     container_name: user-management-service
-    ports:
-      - "8080"
     depends_on:
       - eureka-server
       - kafka
       - postgres-user-management
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-security:5432/user-management-db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-user-management:5432/user-management-db
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
     networks:
@@ -85,14 +79,12 @@ services:
     build: ./training-service
     image: training-service
     container_name: training-service
-    ports:
-      - "8080"
     depends_on:
       - eureka-server
       - kafka
       - postgres-training
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-security:5432/training-db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-training:5432/training-db
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
     networks:
@@ -138,7 +130,7 @@ services:
     image: postgres:15
     container_name: postgres-subscription
     environment:
-      POSTGRES_DB: subsciption-db
+      POSTGRES_DB: subscription-db
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     ports:
