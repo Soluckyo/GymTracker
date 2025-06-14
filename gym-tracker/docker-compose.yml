@@ -1,0 +1,175 @@
+services:
+  eureka-server:
+    build: ./eureka-server
+    image: eureka-server
+    container_name: eureka-server
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    networks:
+      - backend
+    environment:
+      - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
+        - EUREKA_CLIENT_FETCH_REGISTRY=false
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: always
+
+
+  api-gateway:
+    build: ./api-gateway
+    image: api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+    networks:
+      - backend
+    restart: always
+
+  security-service:
+    build: ./security-service
+    image: security-service
+    container_name: security-service
+    ports:
+      - "8080"
+    depends_on:
+      - eureka-server
+      - postgres-security
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-security:5432/security-db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+    networks:
+      - backend
+    restart: always
+
+  subscription-service:
+    build: ./subscription-service
+    image: subscription-service
+    container_name: subscription-service
+    ports:
+      - "8080"
+    depends_on:
+      - eureka-server
+      - postgres-subscription
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-security:5432/subscription-db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+    networks:
+      - backend
+    restart: always
+
+  user-management-service:
+    build: ./user-management-service
+    image: user-management-service
+    container_name: user-management-service
+    ports:
+      - "8080"
+    depends_on:
+      - eureka-server
+      - kafka
+      - postgres-user-management
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-security:5432/user-management-db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+    networks:
+      - backend
+    restart: always
+
+  training-service:
+    build: ./training-service
+    image: training-service
+    container_name: training-service
+    ports:
+      - "8080"
+    depends_on:
+      - eureka-server
+      - kafka
+      - postgres-training
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-security:5432/training-db
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+    networks:
+      - backend
+    restart: always
+
+  zookeeper:
+    image: bitnami/zookeeper:3.8
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    networks:
+      - backend
+  kafka:
+    image: bitnami/kafka:3.6
+    container_name: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    networks:
+      - backend
+
+  postgres-security:
+    image: postgres:15
+    container_name: postgres-security
+    environment:
+      POSTGRES_DB: security-db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    networks:
+      - backend
+
+  postgres-subscription:
+    image: postgres:15
+    container_name: postgres-subscription
+    environment:
+      POSTGRES_DB: subsciption-db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5434:5432"
+    networks:
+      - backend
+
+  postgres-user-management:
+    image: postgres:15
+    container_name: postgres-user-management
+    environment:
+      POSTGRES_DB: user-management-db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5435:5432"
+    networks:
+      - backend
+
+  postgres-training:
+    image: postgres:15
+    container_name: postgres-training
+    environment:
+      POSTGRES_DB: training-db
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5436:5432"
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
