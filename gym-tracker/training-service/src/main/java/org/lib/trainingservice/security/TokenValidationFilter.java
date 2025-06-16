@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.lib.trainingservice.dto.JwtValidationResponse;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
+@Slf4j
 public class TokenValidationFilter extends OncePerRequestFilter {
 
     private final RestTemplate restTemplate;
@@ -39,6 +41,7 @@ public class TokenValidationFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            log.warn("Не найден или невалидный Authorization header");
             filterChain.doFilter(request, response);
             return;
         }
@@ -63,22 +66,28 @@ public class TokenValidationFilter extends OncePerRequestFilter {
             if(validationResponse.getStatusCode().is2xxSuccessful()) {
                 authenticationToken = prepareAuthenticationToken(validationResponse);
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                log.info("Пользователь успешно авторизован");
+            }else{
+                log.warn("Token validation failed: {}", validationResponse.getStatusCode());
             }
 
             filterChain.doFilter(request, response);
 
         } catch (Exception e) {
+            log.error("Token validation error", e);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
 
     }
 
     public UsernamePasswordAuthenticationToken prepareAuthenticationToken(ResponseEntity<String> validationResponse) {
-            String body = validationResponse.getBody();
+        String body = validationResponse.getBody();
         JwtValidationResponse jwtInfo = null;
         try {
             jwtInfo = objectMapper.readValue(body, JwtValidationResponse.class);
+            log.info("Аутентификация пользователя: {}, role: {}", jwtInfo.getEmail(), jwtInfo.getRole());
         } catch (JsonProcessingException e) {
+            log.error("Не удалось парсинга ответа на проверку", e);
             throw new RuntimeException(e);
         }
         List<SimpleGrantedAuthority> authorities = List.of(

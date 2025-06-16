@@ -20,6 +20,7 @@ public interface ITrainingService {
     void deleteTraining(UUID trainingId);
     TrainingDTO signUpForTraining(SignUpForTrainingDto signUpForTrainingDto);
     Training findTrainingById(UUID trainingId);
+    String getTrainerName(UUID trainingId);
 
 
 

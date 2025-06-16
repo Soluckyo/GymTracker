@@ -114,9 +114,10 @@ public class TrainingService implements ITrainingService {
         training.setTitle("Персональная тренировка с тренером" + createTrainingDto.getTitle() );
         training.setTrainerId(createTrainingDto.getTrainerId());
         training.setStartTime(createTrainingDto.getStartTime());
-        training.setEndTime(training.getStartTime().plus(training.getDuration()));
         training.setDuration(createTrainingDto.getDuration());
+        training.setEndTime(training.getStartTime().plus(training.getDuration()));
         training.setRoom(Room.COMMON_ROOM);
+
 
         Training savedTraining = trainingRepository.save(training);
         kafkaProducer.sendTrainerInfoRequest(savedTraining.getTrainerId(), savedTraining.getTrainingId());
@@ -137,5 +138,13 @@ public class TrainingService implements ITrainingService {
     @Override
     public Training findTrainingById(UUID trainingId) {
         return null;
+    }
+
+    public String getTrainerName(UUID trainingId) {
+        Training training = trainingRepository.findById(trainingId).orElseThrow(
+                () -> new TrainingNotFoundException("Тренировка не найдена!")
+        );
+
+        return training.getTrainerName();
     }
 }
