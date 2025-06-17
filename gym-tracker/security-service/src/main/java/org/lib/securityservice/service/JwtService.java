@@ -1,13 +1,9 @@
 package org.lib.securityservice.service;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.lib.securityservice.dto.JwtResponseDTO;
 import org.lib.securityservice.dto.TokenValidationResponse;
@@ -94,10 +90,10 @@ public class JwtService implements IJwtService {
     }
 
     //Декодирование токена и получение данных
-    public ResponseEntity<?> extractUserInfoFromToken(String authHeader) {
+    public ResponseEntity<TokenValidationResponse> extractUserInfoFromToken(String authHeader) {
         if(authHeader == null || !authHeader.startsWith("Bearer ")) {
             log.warn("Недопустимый заголовок авторизации: {}", authHeader);
-            return ResponseEntity.badRequest().body("Недопустимый заголовок авторизации");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
         log.info("Заголовок авторизации: {}", authHeader);
@@ -106,7 +102,7 @@ public class JwtService implements IJwtService {
 
         if(!validateToken(token)) {
             log.info("Токен не валиден: {}", token);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Недействительный или просроченный токен");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
 
         log.info("Прошел if");

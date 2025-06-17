@@ -8,6 +8,7 @@ import org.lib.securityservice.dto.JwtRequestDTO;
 import org.lib.securityservice.dto.JwtResponseDTO;
 import org.lib.securityservice.dto.RefreshTokenDTO;
 import org.lib.securityservice.dto.RegisterRequest;
+import org.lib.securityservice.dto.TokenValidationResponse;
 import org.lib.securityservice.service.IAppUserService;
 import org.lib.securityservice.service.IJwtService;
 import org.springframework.http.ResponseEntity;
@@ -78,7 +79,7 @@ public class AuthController {
             description = "Проверяет валиден ли токен. Берет токен из Header authorization"
     )
     @GetMapping("/validate")
-    public ResponseEntity<?> validate(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<TokenValidationResponse> validate(@RequestHeader("Authorization") String authHeader) {
         return jwtService.extractUserInfoFromToken(authHeader);
     }
 
