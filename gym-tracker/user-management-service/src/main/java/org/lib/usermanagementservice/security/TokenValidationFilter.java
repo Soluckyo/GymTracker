@@ -1,6 +1,5 @@
 package org.lib.usermanagementservice.security;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -11,12 +10,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.lib.usermanagementservice.dto.JwtValidationResponse;
+import org.lib.usermanagementservice.dto.TokenValidationResponse;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,9 +22,10 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.security.Key;
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.UUID;
 
 @Component
 @Slf4j
@@ -42,6 +38,7 @@ public class TokenValidationFilter extends OncePerRequestFilter {
 
     @Value("${jwt.secret}")
     private String secret;
+    private final Key jwtSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
 
 
     public TokenValidationFilter(RestTemplate restTemplate, ObjectMapper objectMapper, WebClient webClient) {
@@ -63,7 +60,28 @@ public class TokenValidationFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
 
         try {
-            Mono<Boolean> validationMono = webClient.get()
+            TokenValidationResponse tokenValidationResponse = validateToken(token);
+            String role = tokenValidationResponse.getRole();
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(
+                            tokenValidationResponse.getEmail(),
+                            null,
+                            List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                            );
+            authToken.setDetails(tokenValidationResponse.getUserId());
+
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+            filterChain.doFilter(request, response);
+        }catch (Exception e) {
+            log.error("Ошибка валидации токена: {}", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }
+    }
+
+
+    private TokenValidationResponse validateToken(String token) {
+        try{
+            return webClient.get()
                     .uri("auth/validate")
                     .header("Authorization", "Bearer " + token)
                     .retrieve()
@@ -71,69 +89,33 @@ public class TokenValidationFilter extends OncePerRequestFilter {
                             httpStatusCode -> !httpStatusCode.is2xxSuccessful(),
                             clientResponse -> {
                                 log.error("Ошибка валидации токена. Статус: {}", clientResponse.statusCode());
-                                return Mono.error(new SecurityException("Токен не валиден")):
+                                return Mono.error(new SecurityException("Токен не валиден"));
                             }
                     )
-                    .bodyToMono(JwtValidationResponse.class)
+                    .bodyToMono(TokenValidationResponse.class)
                     .timeout(Duration.ofMillis(500))
-                    .subscribe(
-                            tokenResponse -> {
-                                // Успешная валидация
-                                UsernamePasswordAuthenticationToken auth =
-                                        new UsernamePasswordAuthenticationToken(
-                                                tokenResponse.getEmail(),
-                                                null,
-                                                List.of(new SimpleGrantedAuthority("ROLE_" + tokenResponse.getRole()))
-                                        );
-                                auth.setDetails(tokenResponse.getUserId());
-                                SecurityContextHolder.getContext().setAuthentication(auth);
-                                filterChain.doFilter(request, response);
-                            },
-                            error -> {
-                                // Обработка ошибок
-                                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                                log.error("Ошибка при валидации токена", error);
-                            }
-                    );
+                    .block();
         }catch (Exception e){
-            log.error(e.getMessage());
+            log.warn("Удаленная валидация не сработала, вызываем локальную валидацию");
+            return validateTokenLocally(token);
         }
-
-
-        Boolean isValid = validationMono.block();
-
-        if (Boolean.TRUE.equals(isValid)) {
-            SecurityContextHolder.getContext().setAuthentication(createAuth(token));
-            filterChain.doFilter(request, response);
-        } else {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        }
-
     }
 
-    private boolean validateTokenLocally(String token){
+    private TokenValidationResponse validateTokenLocally(String token){
         try{
-            Jwts.parserBuilder()
-                    .setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret)))
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(jwtSecretKey)
                     .build()
-                    .parseClaimsJws(token);
-            return true;
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            return TokenValidationResponse.builder()
+                    .userId(UUID.fromString(claims.get("userId", String.class)))
+                    .email(claims.getSubject())
+                    .role(claims.get("role", String.class))
+                    .build();
         } catch (Exception e) {
-            return false;
+            throw new SecurityException("Не удалось провалидировать токен");
         }
-    }
-
-    public UsernamePasswordAuthenticationToken createAuth(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret)))
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-
-        return new UsernamePasswordAuthenticationToken(
-                claims.getSubject(),
-                null,
-                List.of(new SimpleGrantedAuthority("ROLE_" + claims.get("role").toString()))
-        );
     }
 }

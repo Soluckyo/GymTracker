@@ -9,7 +9,7 @@ import java.util.UUID;
 @Data
 @Builder
 @Schema(description = "DTO Ответ при валидации токена")
-public class JwtValidationResponse {
+public class TokenValidationResponse {
 
     @Schema(description = "Id пользователя", example = "mail@gym.com")
     private UUID userId;
