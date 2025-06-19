@@ -1,6 +1,7 @@
 package org.lib.usermanagementservice.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.lib.usermanagementservice.client.AuthClient;
 import org.lib.usermanagementservice.dto.RegisterAppUserRequest;
 import org.lib.usermanagementservice.dto.RegistrationAdmin;
@@ -17,6 +18,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.CompletableFuture;
+
+@Slf4j
 @Service
 public class AdminService implements IAdminService {
 
@@ -40,25 +44,38 @@ public class AdminService implements IAdminService {
         if(registrationAdmin == null) {
             throw new IllegalArgumentException("Данные полей для регистрации администратора не заполнены");
         }
-        if(adminRepository.existsByEmail(registrationAdmin.getEmail())){
-            throw new EmailAlreadyExistsException("Такой Email уже используется");
+
+
+        CompletableFuture<Boolean> emailCheckFuture = CompletableFuture.supplyAsync(
+                () -> adminRepository.existsByEmail(registrationAdmin.getEmail())
+        );
+
+        String encodedPass = passwordEncoder.encode(registrationAdmin.getPassword());
+
+        if (emailCheckFuture.join()) {
+            throw new EmailAlreadyExistsException("Email уже используется");
         }
+
         Admin admin = Admin.builder()
                 .name(registrationAdmin.getName())
                 .email(registrationAdmin.getEmail())
-                .password(passwordEncoder.encode(registrationAdmin.getPassword()))
+                .password(encodedPass)
                 .build();
 
         Admin savedAdmin = adminRepository.save(admin);
 
         RegisterAppUserRequest authUser = new RegisterAppUserRequest();
-        authUser.setEmail(registrationAdmin.getEmail());
-        authUser.setPassword(passwordEncoder.encode(registrationAdmin.getPassword()));
+        authUser.setEmail(admin.getEmail());
+        authUser.setPassword(encodedPass);
         authUser.setRole("ADMIN");
         authUser.setExternalUserId(savedAdmin.getAdminId());
 
-        authClient.registerAppUser(authUser);
-
+        try{
+            authClient.registerAppUser(authUser);
+        }catch(Exception e){
+            log.error("Регистрация пользователя в сервисе безопасности не удалась," +
+                    " но пользователь создан локально. Ошибка: {}", e.getMessage());
+        }
         return savedAdmin;
     }
 

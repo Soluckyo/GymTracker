@@ -1,4 +1,5 @@
 services:
+
   eureka-server:
     build: ./eureka-server
     image: eureka-server

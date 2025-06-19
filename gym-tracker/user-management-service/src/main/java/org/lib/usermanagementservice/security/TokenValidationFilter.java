@@ -1,6 +1,5 @@
 package org.lib.usermanagementservice.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -16,7 +15,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -32,19 +30,12 @@ import java.util.UUID;
 public class TokenValidationFilter extends OncePerRequestFilter {
 
     private final WebClient webClient;
-    private final RestTemplate restTemplate;
-    private final ObjectMapper objectMapper;
-    private UsernamePasswordAuthenticationToken authenticationToken;
 
     @Value("${jwt.secret}")
     private String secret;
-    private final Key jwtSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
 
-
-    public TokenValidationFilter(RestTemplate restTemplate, ObjectMapper objectMapper, WebClient webClient) {
-        this.restTemplate = restTemplate;
-        this.objectMapper = objectMapper;
-        this.webClient = webClient;
+    public TokenValidationFilter(WebClient.Builder webClientBuilder) {
+        this.webClient = webClientBuilder.build();
     }
 
     @Override
@@ -103,6 +94,7 @@ public class TokenValidationFilter extends OncePerRequestFilter {
 
     private TokenValidationResponse validateTokenLocally(String token){
         try{
+            Key jwtSecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(jwtSecretKey)
                     .build()
