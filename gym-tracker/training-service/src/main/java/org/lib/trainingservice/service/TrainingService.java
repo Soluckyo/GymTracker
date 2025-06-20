@@ -111,7 +111,7 @@ public class TrainingService implements ITrainingService {
         Training training = new Training();
         training.setType(TrainingType.PERSONAL);
         //TODO: добавить возможность получения имени тренера!
-        training.setTitle("Персональная тренировка с тренером" + createTrainingDto.getTitle() );
+        training.setTitle("Персональная тренировка с тренером");
         training.setTrainerId(createTrainingDto.getTrainerId());
         training.setStartTime(createTrainingDto.getStartTime());
         training.setDuration(createTrainingDto.getDuration());
